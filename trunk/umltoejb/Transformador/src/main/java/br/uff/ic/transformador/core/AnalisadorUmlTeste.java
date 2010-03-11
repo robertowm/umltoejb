@@ -29,48 +29,7 @@ public class AnalisadorUmlTeste extends AnalisadorUml {
     protected void insertMetamodelStructure() throws Exception {
         logger.debug("Inserting Uml MetaModel Structure");
 
-        this.ieos.insertClass("Classifier");
-        this.ieos.insertClass("Typed");
-//        this.ieos.insertClass("DataType");
-//        this.ieos.insertClass("Set");
         this.ieos.insertClass("Class");
-//        this.ieos.insertClass("AssociationClass");
-        this.ieos.insertClass("Feature");
-        this.ieos.insertClass("AssociationEnd");
-        this.ieos.insertClass("Association");
-//        this.ieos.insertClass("Attribute");
-//        this.ieos.insertClass("Operation");
-//        this.ieos.insertClass("Parameter");
-
-//        this.ieos.insertGeneralization("DataType", "Classifier");
-//        this.ieos.insertGeneralization("Set", "DataType");
-//        this.ieos.insertGeneralization("Class", "Classifier");
-//        this.ieos.insertGeneralization("AssociationClass", "Classifier");
-        this.ieos.insertGeneralization("Feature", "Typed");
-        this.ieos.insertGeneralization("AssociationEnd", "Feature");
-//        this.ieos.insertGeneralization("Attribute", "Feature");
-//        this.ieos.insertGeneralization("Operation", "Feature");
-//        this.ieos.insertGeneralization("Parameter", "Typed");
-
-//        this.ieos.insertAssociation("Set", "set", "0..*", "1", "elementType", "Classifier");
-//        this.ieos.insertAssociation("Classifier", "class", "0..1", "*", "types", "Typed");
-//        this.ieos.insertAssociation("AssociationEnd", "otherEnd", "1..*", "1..*", "others", "AssociationEnd");
-        this.ieos.insertAssociation("AssociationEnd", "end", "0..*", "1", "association", "Association");
-        // Agregações (colocar invariantes) [Class <>- Feature][Operation <>- Parameter]
-//        this.ieos.insertAssociation("Class", "class", "0..1", "*", "feature", "Feature");
-//        this.ieos.insertAssociation("AssociationClass", "associationClass", "0..1", "*", "feature", "Feature");
-//        this.ieos.insertAssociation("Operation", "operation", "1", "*", "parameter", "Parameter");
-        // Fim agregações
-
-        this.ieos.insertAttribute("Classifier", "nameClassifier", "String");
-        this.ieos.insertAttribute("Typed", "nameTyped", "String");
-//        this.ieos.insertAttribute("Feature", "visibility", "String"); // ### Tipo VisibilityKind
-//        this.ieos.insertAttribute("AssociationEnd", "lower", "String"); // ### Tipo Lowerbound
-//        this.ieos.insertAttribute("AssociationEnd", "upper", "String"); // ### Tipo Upperbound
-//        this.ieos.insertAttribute("AssociationEnd", "composition", "Boolean");
-//        this.ieos.insertAttribute("Attribute", "type", "String");
-//        this.ieos.insertAttribute("Operation", "returnType", "String");
-
     }
 
     // Metodos exclusivos deste metamodelo
@@ -78,14 +37,6 @@ public class AnalisadorUmlTeste extends AnalisadorUml {
     public boolean insertOperationOCL(String contextClass, String nameOperation,
             String returnType, String bodyOperation, Object[] params) {
         boolean result;
-//        try {
-//            result = this.ieos.insertOperation(contextClass, nameOperation, returnType, bodyOperation, params);
-//        } catch (XEOSException e) {
-//            logger.error("Error inserting operation: " + e.getMessage());
-//            logger.error(e.toString());
-//            result = false;
-//        }
-//        return result;
         return true;
 
     }
