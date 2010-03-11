@@ -7,6 +7,7 @@ package br.uff.ic.interfacegrafica.interfacegrafica;
 
 import br.uff.ic.transformador.core.AnalisadorEjb;
 import br.uff.ic.transformador.core.AnalisadorUml;
+import br.uff.ic.transformador.core.AnalisadorUmlLivro;
 import core.XEOS;
 import core.exception.XEOSException;
 import java.awt.Graphics;
@@ -21,7 +22,8 @@ import javax.swing.JPanel;
 public class PrincipalJFrame extends javax.swing.JFrame {
 
 //    private AnalisadorUmlTeste xess;
-    private AnalisadorUml aUml;
+//    private AnalisadorUml aUml;
+    private AnalisadorUmlLivro aUml;
     private AnalisadorEjb aEjb;
     private XEOS xeos;
 
@@ -82,8 +84,6 @@ public class PrincipalJFrame extends javax.swing.JFrame {
         aUml.insertClass("Breakfast");
         aUml.insertClass("StandardBreakfast");
         aUml.insertClass("Comestible");
-        aUml.insertAssociationClass("PartClass");
-        aUml.insertAssociationClass("ChangeClass");
 
         aUml.insertAttribute("accountNumberC", "public", "Integer", "Customer", true);
         aUml.insertAttribute("addressC", "public", "String", "Customer", true);
@@ -100,97 +100,77 @@ public class PrincipalJFrame extends javax.swing.JFrame {
         aUml.insertAttribute("minimalQuantityCo", "public", "Integer", "Comestible", true);
         aUml.insertAttribute("priceComestibleCo", "public", "Double", "Comestible", true);
         aUml.insertAttribute("transportFormCo", "public", "String", "Comestible", true);
-        aUml.insertAttribute("quantityPC", "public", "Integer", "PartClass", false);
-        aUml.insertAttribute("quantityCC", "public", "Integer", "ChangeClass", false);
 
         aUml.insertAssociationEnd("customerBO", "public", "Customer", "1", "1", false, "Customer", true);
         aUml.insertAssociationEnd("ordersC", "public", "BreakfastOrder", "1", "*", false, "BreakfastOrder", true);
         aUml.insertLinksBetweenAssociationEnds("ordersC", "customerBO");
         aUml.insertAssociation("Customer_BreakfastOrder", "customerBO", "ordersC");
-//
+
         aUml.insertAssociationEnd("orderB", "public", "BreakfastOrder", "1", "1", false, "BreakfastOrder", true);
         aUml.insertAssociationEnd("breakfastsBO", "public", "Breakfast", "1", "*", false, "Breakfast", true);
         aUml.insertLinksBetweenAssociationEnds("orderB", "breakfastsBO");
         aUml.insertAssociation("BreakfastOrder_Breakfast", "orderB", "breakfastsBO");
-//
+
         aUml.insertAssociationEnd("breakfastsSB", "public", "Breakfast", "0", "*", false, "Breakfast", true);
         aUml.insertAssociationEnd("standardB", "public", "StandardBreakfast", "1", "1", false, "StandardBreakfast", true);
         aUml.insertLinksBetweenAssociationEnds("breakfastsSB", "standardB");
         aUml.insertAssociation("Breakfast_StandardBreakfast", "breakfastsSB", "standardB");
-//
-        aUml.insertAssociationEnd("standardsPC", "public", "StandardBreakfast", "0", "*", false, "StandardBreakfast", true);
-        aUml.insertAssociationEnd("comestiblePC", "public", "Comestible", "1", "*", false, "Comestible", true);
-        aUml.insertAssociationEnd("partPC", "public", "PartClass", "1", "1", true, "PartClass", false);
-        aUml.insertLinksBetweenAssociationEnds("standardsPC", "comestiblePC");
-        aUml.insertLinksBetweenAssociationEnds("standardsPC", "partPC");
-        aUml.insertLinksBetweenAssociationEnds("comestiblePC", "partPC");
-        aUml.insertAssociation("StandardBreakfast_Part_Comestible", "standardsPC", "comestiblePC", "partPC");
 
-        aUml.insertAssociationEnd("breakfastsCC", "public", "Breakfast", "0", "*", false, "Breakfast", true);
-        aUml.insertAssociationEnd("comestibleItemCC", "public", "Comestible", "0", "*", false, "Comestible", true);
-        aUml.insertAssociationEnd("changeCC", "public", "ChangeClass", "1", "1", true, "ChangeClass", false);
-        aUml.insertLinksBetweenAssociationEnds("breakfastsCC", "changeCC");
-        aUml.insertLinksBetweenAssociationEnds("breakfastsCC", "comestibleItemCC");
-        aUml.insertLinksBetweenAssociationEnds("changeCC", "comestibleItemCC");
-        aUml.insertAssociation("Breakfast_Change_Comestible", "breakfastsCC", "comestibleItemCC", "changeCC");
+        aUml.insertAssociationEnd("standardsC", "public", "StandardBreakfast", "0", "*", false, "Comestible", true);
+        aUml.insertAssociationEnd("comestibleSB", "public", "Comestible", "1", "*", false, "StandardBreakfast", true);
+        aUml.insertLinksBetweenAssociationEnds("standardsPC", "comestiblePC");
+        aUml.insertAssociationClass("PartClass", "standardsC", "comestibleSB");
+        aUml.insertAttribute("quantityPC", "public", "Integer", "PartClass", false);
+
+        aUml.insertAssociationEnd("breakfastsC", "public", "Breakfast", "0", "*", false, "Comestible", true);
+        aUml.insertAssociationEnd("comestibleItemB", "public", "Comestible", "0", "*", false, "Breakfast", true);
+        aUml.insertLinksBetweenAssociationEnds("breakfastsC", "comestibleItemB");
+        aUml.insertAssociationClass("ChangeClass", "breakfastsC", "comestibleItemB");
+        aUml.insertAttribute("quantityCC", "public", "Integer", "ChangeClass", false);
 
         aUml.insertOperation("createOrder", "public", "Boolean", "Customer", true);
         aUml.insertOperation("calculatePrice", "public", "Double", "BreakfastOrder", true);
 
-        aUml.insertOperationOCL("Set(Feature)", "getAssociationEndsWithComposition", "Set(Feature)",
-            "self->select(f : Feature | f.oclIsKindOf(AssociationEnd))" +
-                        "->select(f : Feature | f.oclAsType(AssociationEnd).composition = true)"
-            , new Object[0]);
-
-        aUml.insertOperationOCL("Class", "getAllContained", "Set(Class)",
-            "if contained->includes(self) then " +
-                "contained->asSet() " +
-            "else " +
-                "let allContained = contained->including(self)->asSet() in " +
-                "let acc = contained->including(self)->asSet() in " +
-                "acc->union(" +
-                "self.feature" +
-                        ".getAssociationEndsWithComposition()" +
-                        "->collect(f : Feature | f.class.oclAsType(Class))" +
-                        "->asSet()" +
-                        ")" +
-                            " endif "
-            , new Object[]{new String[]{"contained", "Set(Class)"}});
-//        Object[] params = new Object[]{new String[]{"contained", "Set(Class)"}};
-//        aUml.insertOperationOCL("Class", "getAllContained", "Set(Class)",
+////////////////////// AGUARDANDO RESOLUCAO DOS PROBLEMAS //////////////////////
+//        aUml.insertOperationOCL("AssociationClass", "getAllContained", "Set(Classifier)",
 //            "if contained->includes(self) then " +
 //                "contained->asSet() " +
 //            "else " +
-//                "let allContained = contained->including(self)->asSet() " +
+//                "let allContained = contained->including(self) " +
 //                    "in self.feature" +
 //                        "->select(f : Feature | f.oclIsKindOf(AssociationEnd))" +
 //                        "->select(f : Feature | f.oclAsType(AssociationEnd).composition = true)" +
-//                        "->collect(f : Feature | f.class.oclAsType(Class))" +
-//                        "->asSet()" +
-//                        "->iterate( cc : Class ; acc : Set(Class) = allContained->asSet() " +
-//                            "| allContained->union(cc.getAllContained(allContained->asSet())))" +
-//                            "->asSet() endif "
+//                        "->collect(f : Feature | f.classifier)" +
+//                        "->iterate( cc : Classifier ; acc : Set(Classifier) = allContained " +
+//                            "| allContained->union(cc.getAllContained(allContained)))" +
+//            " endif "
 //            , params);
 
-        aUml.insertOperationOCL("Class", "emptySet", "Set(Class)",
-            "Class.allInstances()->select(c|false) ", new Object[0]);
 
-        aUml.insertOperationOCL("Class", "getOuterMostContainerFromClass", "Classifier",
-                "if " +
-                "self.feature" +
-                    "->select(f : Feature | f.oclIsKindOf(AssociationEnd))" +
-                    "->exists(f : Feature | f.oclAsType(AssociationEnd).otherEnd" +
-                    "->exists(oe : AssociationEnd | oe.composition = true))" +
-                " then " +
-                    "Classifier.allInstances()->select(cl | cl.oclIsKindOf(Class) and " +
-                        "self.feature->select(f : Feature | f.oclIsKindOf(AssociationEnd))" +
-                                    "->select(f : Feature | f.oclAsType(AssociationEnd).otherEnd->exists(oe : AssociationEnd | oe.composition = true))" +
-                        ".classifier->includes(cl))->asOrderedSet()->first().oclAsType(Class).getOuterMostContainerFromClass()" +
-                " else " +
-                    "self" +
-                " endif"
-                    , new Object[0]);
+////////////////////////////////////// OK //////////////////////////////////////
+//        aUml.insertOperationOCL("Class", "emptySet", "Set(Class)",
+//            "Class.allInstances()->select(c|false) ", new Object[0]);
 
+////////////////////// AGUARDANDO RESOLUCAO DOS PROBLEMAS //////////////////////
+//*********************************** REVER ************************************
+//        aUml.insertOperationOCL("Class", "getOuterMostContainerFromClass", "Classifier",
+//                "if " +
+//                "self.feature" +
+//                    "->select(f : Feature | f.oclIsKindOf(AssociationEnd))" +
+//                    "->exists(f : Feature | f.oclAsType(AssociationEnd).otherEnd" +
+//                    "->exists(oe : AssociationEnd | oe.composition = true))" +
+//                " then " +
+//                    "Classifier.allInstances()->select(cl | cl.oclIsKindOf(Class) and " +
+//                        "self.feature->select(f : Feature | f.oclIsKindOf(AssociationEnd))" +
+//                                    "->select(f : Feature | f.oclAsType(AssociationEnd).otherEnd->exists(oe : AssociationEnd | oe.composition = true))" +
+//                        ".classifier->includes(cl))->asOrderedSet()->first().oclAsType(Class).getOuterMostContainerFromClass()" +
+//                " else " +
+//                    "self" +
+//                " endif"
+//                    , new Object[0]);
+
+////////////////////// AGUARDANDO RESOLUCAO DOS PROBLEMAS //////////////////////
+//*********************************** REVER ************************************
 //        aUml.insertOperationOCL("Association", "getOuterMostContainerFromAssociation", "Boolean",
 //                "let var = Classifier.allInstances()" +
 //                    "->select(cl : Classifier | (cl.oclIsKindOf(Class) or cl.oclIsKindOf(AssociationClass)) " +
@@ -205,6 +185,8 @@ public class PrincipalJFrame extends javax.swing.JFrame {
 //                        "endif"
 //                        , new Object[0]);
 
+////////////////////// AGUARDANDO RESOLUCAO DOS PROBLEMAS //////////////////////
+//*********************************** REVER ************************************
 //        aUml.insertOperationOCL("AssociationClass", "getOuterMostContainerFromAssociationClass", "Classifier",
 //                "if self.feature->select(f : Feature | f.oclIsKindOf(AssociationEnd))->size() = 1 then " +
 //                "let var = " +
@@ -230,7 +212,8 @@ public class PrincipalJFrame extends javax.swing.JFrame {
         try {
             xeos.createClassDiagram();
 
-            aUml = new AnalisadorUml(xeos);
+//            aUml = new AnalisadorUml(xeos);
+            aUml = new AnalisadorUmlLivro(xeos);
             aEjb = new AnalisadorEjb(xeos);
 
             xeos.closeClassDiagram();
