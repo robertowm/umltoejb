@@ -15,13 +15,13 @@ import org.slf4j.LoggerFactory;
  *
  * @author robertowm
  */
-public abstract class Analisador {
+public abstract class Dominio {
 
     protected Dictionary<String, String> invariants;
     protected XEOS ieos;
-    protected static Logger logger = LoggerFactory.getLogger(AnalisadorUml.class);
+    protected static Logger logger = LoggerFactory.getLogger(DominioUml.class);
 
-    public Analisador(XEOS ieos) {
+    public Dominio(XEOS ieos) {
         this.invariants = new Hashtable<String, String>();
 
         this.ieos = ieos;
