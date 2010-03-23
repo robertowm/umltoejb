@@ -5,9 +5,13 @@
  */
 package br.uff.ic.interfacegrafica.interfacegrafica;
 
-import br.uff.ic.transformador.core.AnalisadorEjb;
-import br.uff.ic.transformador.core.AnalisadorUml;
-import br.uff.ic.transformador.core.AnalisadorUmlLivro;
+import br.uff.ic.transformador.core.ContratoTransformacao;
+import br.uff.ic.transformador.core.DominioEjb;
+import br.uff.ic.transformador.core.DominioUml;
+import br.uff.ic.transformador.core.DominioUmlEjb;
+import br.uff.ic.transformador.core.DominioUmlLivro;
+import br.uff.ic.transformador.core.GeradorCodigoEjb;
+import br.uff.ic.transformador.core.TransformadorUmlEjb;
 import core.XEOS;
 import core.exception.XEOSException;
 import java.awt.Graphics;
@@ -21,10 +25,8 @@ import javax.swing.JPanel;
  */
 public class PrincipalJFrame extends javax.swing.JFrame {
 
-//    private AnalisadorUmlTeste xess;
-//    private AnalisadorUml aUml;
-    private AnalisadorUmlLivro aUml;
-    private AnalisadorEjb aEjb;
+    private DominioUmlLivro aUml;
+    private DominioEjb aEjb;
     private XEOS xeos;
 
     private void criarDiagramaObjetosEjb() throws Exception {
@@ -209,12 +211,13 @@ public class PrincipalJFrame extends javax.swing.JFrame {
         initComponents();
 
         xeos = new XEOS();
+        DominioUmlEjb aJuncao = null;
         try {
             xeos.createClassDiagram();
 
-//            aUml = new AnalisadorUml(xeos);
-            aUml = new AnalisadorUmlLivro(xeos);
-            aEjb = new AnalisadorEjb(xeos);
+            aUml = new DominioUmlLivro(xeos);
+            aEjb = new DominioEjb(xeos);
+            aJuncao = new DominioUmlEjb(xeos);
 
             xeos.closeClassDiagram();
         } catch (XEOSException ex) {
@@ -226,13 +229,20 @@ public class PrincipalJFrame extends javax.swing.JFrame {
             xeos.createObjectDiagram();
 
             criarDiagramaObjetosUml();
-            criarDiagramaObjetosEjb();
+//            criarDiagramaObjetosEjb();
+
+            ContratoTransformacao ct = new ContratoTransformacao
+                    <DominioUmlLivro, DominioEjb, DominioUmlEjb, TransformadorUmlEjb, GeradorCodigoEjb>
+                    (aUml, aEjb, aJuncao, new TransformadorUmlEjb(aUml, aEjb, aJuncao), new GeradorCodigoEjb(aEjb,""));
+            ct.transformar();
 
             xeos.closeObjectDiagram();
         } catch (Exception ex) {
             ex.printStackTrace();
             System.exit(0);
         }
+
+
 
 //        System.out.println(" - Invariantes UML estão OK? " + aUml.checkAllInvariants());
 //        System.out.println(" - Invariantes EJB estão OK? " + aEjb.checkAllInvariants());
