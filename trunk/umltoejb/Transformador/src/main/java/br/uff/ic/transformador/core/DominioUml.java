@@ -3,48 +3,47 @@ package br.uff.ic.transformador.core;
 import core.XEOS;
 import core.exception.XEOSException;
 
-public class AnalisadorUmlLivro extends Analisador {
+public class DominioUml extends Dominio {
 
-    private int count;
-
-    public AnalisadorUmlLivro(XEOS ieos) {
+    public DominioUml(XEOS ieos) {
         super(ieos);
-        count = 0;
     }
 
     @Override
     public void createSpecificationOfCurrentDiagram() throws Exception {
         this.ieos.insertObject("Class", "nullC");
-        this.ieos.insertValue("Class", "name", "nullC", "nullC");
+        this.ieos.insertValue("Class", "nameClassifier", "nullC", "nullC");
+        this.ieos.insertObject("AssociationClass", "nullAC");
+        this.ieos.insertValue("AssociationClass", "nameClassifier", "nullAC", "nullAC");
     }
 
     @Override
     protected void insertMetamodelInvariants() throws Exception {
         logger.debug("Inserting Uml MetaModel Invariants");
 
-//        // Classes associativas não podem ter um AssociationEnd vinculado a ela que possua composition = true
-//        this.insertInvariant("notExistsCompositionAssociationEndAssignedToAssociationClass",
-//                "AssociationClass.allInstances()->forAll(ac|ac.feature->select(f|f.oclIsTypeOf(AssociationEnd))->forAll(ae | ae.oclAsType(AssociationEnd).composition = false))");
-//
-//        // Restricao da composição (Class e AssociationClass)
-//        this.insertInvariant("restrictionFeaturehasClassorAssociationClass",
-//                "Feature.allInstances()->forAll(f|f.class = nullC xor f.associationClass = nullAC)");
-//
+        // Classes associativas não podem ter um AssociationEnd vinculado a ela que possua composition = true
+        this.insertInvariant("notExistsCompositionAssociationEndAssignedToAssociationClass",
+                "AssociationClass.allInstances()->forAll(ac|ac.feature->select(f|f.oclIsTypeOf(AssociationEnd))->forAll(ae | ae.oclAsType(AssociationEnd).composition = false))");
+
+        // Restricao da composição (Class e AssociationClass)
+        this.insertInvariant("restrictionFeaturehasClassorAssociationClass",
+                "Feature.allInstances()->forAll(f|f.class = nullC xor f.associationClass = nullAC)");
+
 //        // Attribute precisa tem p campo 'type' preenchido
-//        this.insertInvariant("restrictionRequiredFieldTypeAttribute",
-//                "Attribute.allInstances()->forAll(a|a.type <> 'null')");
+        this.insertInvariant("restrictionRequiredFieldTypeAttribute",
+                "Attribute.allInstances()->forAll(a|a.type <> 'null')");
 //
 //        // Operation precisa tem p campo 'returnType' preenchido
-//        this.insertInvariant("restrictionRequiredFieldReturnTypeOperation",
-//                "Operation.allInstances()->forAll(a|a.returnType <> 'null')");
-//
+        this.insertInvariant("restrictionRequiredFieldReturnTypeOperation",
+                "Operation.allInstances()->forAll(a|a.returnType <> 'null')");
+
 //        // Typed precisa de 'name' preenchido
-//        this.insertInvariant("restrictionRequiredFieldNameTyped",
-//                "Typed.allInstances()->forAll(t|t.nameTyped <> 'null')");
+        this.insertInvariant("restrictionRequiredFieldNameTyped",
+                "Typed.allInstances()->forAll(t|t.nameTyped <> 'null')");
 //
 //        // Classifier precisa de 'name' preenchido
-//        this.insertInvariant("restrictionRequiredFieldNameClassifier",
-//                "Classifier.allInstances()->forAll(c|c.nameClassifier <> 'null')");
+        this.insertInvariant("restrictionRequiredFieldNameClassifier",
+                "Classifier.allInstances()->forAll(c|c.nameClassifier <> 'null')");
     }
 
     @Override
@@ -54,6 +53,22 @@ public class AnalisadorUmlLivro extends Analisador {
 
         Object[] params;
         String[] param;
+
+//        result &= this.insertOperationOCL("ClasseColocadaNoSistema", "NomeDoMetodo", "Retorno", "CodigoOCL", new Object[0]);
+//        params = new Object[]{new String[]{"contained", "Set(Class)"}};
+//        result &= this.insertOperationOCL("Class", "getAllContained", "Set(Class)",
+//            "if contained->includes(self) then " +
+//                "contained->asSet() " +
+//            "else " +
+//                "let allContained = contained->including(self) " +
+//                    "in self.feature" +
+//                        "->select(f : Feature | f.oclIsKindOf(AssociationEnd))" +
+//                        "->select(f : Feature | f.oclAsType(AssociationEnd).composition = true)" +
+//                        "->collect(f : Feature | f.class.oclAsType(Class))" +
+//                        "->asSet()" +
+//                        "->iterate( containedClass : Class ; acc : Set(Class) = allContained " +
+//                            "| acc->union(containedClass.getAllContained(allContained)))" +
+//                            "->asSet() endif ", params);
 
         if (!result) {
             throw new Exception("It was not possible to insert all the operations in the SecureUML model");
@@ -66,13 +81,11 @@ public class AnalisadorUmlLivro extends Analisador {
     protected void insertMetamodelStructure() throws Exception {
         logger.debug("Inserting Uml MetaModel Structure");
 
-        this.ieos.insertClass("ModelElement");
         this.ieos.insertClass("Classifier");
         this.ieos.insertClass("Typed");
         this.ieos.insertClass("DataType");
         this.ieos.insertClass("MySet");
         this.ieos.insertClass("Class");
-        this.ieos.insertClass("Interface");
         this.ieos.insertClass("AssociationClass");
         this.ieos.insertClass("Feature");
         this.ieos.insertClass("AssociationEnd");
@@ -81,15 +94,10 @@ public class AnalisadorUmlLivro extends Analisador {
         this.ieos.insertClass("Operation");
         this.ieos.insertClass("Parameter");
 
-        this.ieos.insertGeneralization("Association", "ModelElement");
-        this.ieos.insertGeneralization("Classifier", "ModelElement");
-        this.ieos.insertGeneralization("Typed", "ModelElement");
         this.ieos.insertGeneralization("DataType", "Classifier");
         this.ieos.insertGeneralization("MySet", "DataType");
         this.ieos.insertGeneralization("Class", "Classifier");
-        this.ieos.insertGeneralization("Interface", "Classifier");
-        this.ieos.insertGeneralization("AssociationClass", "Class");
-        this.ieos.insertGeneralization("AssociationClass", "Association");
+        this.ieos.insertGeneralization("AssociationClass", "Classifier");
         this.ieos.insertGeneralization("Feature", "Typed");
         this.ieos.insertGeneralization("AssociationEnd", "Feature");
         this.ieos.insertGeneralization("Attribute", "Feature");
@@ -98,19 +106,21 @@ public class AnalisadorUmlLivro extends Analisador {
 
         this.ieos.insertAssociation("MySet", "setA", "0..*", "1", "elementType", "Classifier");
         this.ieos.insertAssociation("Classifier", "classifier", "0..1", "*", "types", "Typed");
-        this.ieos.insertAssociation("Class", "classes", "*", "*", "implementedInterfaces", "Interface");
         this.ieos.insertAssociation("AssociationEnd", "otherEnd", "1..*", "1..*", "others", "AssociationEnd");
         this.ieos.insertAssociation("AssociationEnd", "associationEnds", "2..*", "1", "association", "Association");
         // Agregações (colocar invariantes) [Class <>- Feature][Operation <>- Parameter]
         this.ieos.insertAssociation("Class", "class", "0..1", "*", "feature", "Feature");
+        this.ieos.insertAssociation("AssociationClass", "associationClass", "0..1", "*", "feature", "Feature");
         this.ieos.insertAssociation("Operation", "operation", "1", "*", "parameter", "Parameter");
         // Fim agregações
 
-        this.ieos.insertAttribute("ModelElement", "name", "String");
+        this.ieos.insertAttribute("Classifier", "nameClassifier", "String");
+        this.ieos.insertAttribute("Typed", "nameTyped", "String");
         this.ieos.insertAttribute("Feature", "visibility", "String"); // ### Tipo VisibilityKind
         this.ieos.insertAttribute("AssociationEnd", "lower", "String"); // ### Tipo Lowerbound
         this.ieos.insertAttribute("AssociationEnd", "upper", "String"); // ### Tipo Upperbound
         this.ieos.insertAttribute("AssociationEnd", "composition", "Boolean");
+        this.ieos.insertAttribute("Association", "nameAssociation", "String");
         this.ieos.insertAttribute("Attribute", "type", "String");
         this.ieos.insertAttribute("Operation", "returnType", "String");
 
@@ -136,11 +146,14 @@ public class AnalisadorUmlLivro extends Analisador {
             logger.error("Error when insert a class: the UML diagram must be created");
             return false;
         }
+        if (name == null) {
+            name = "null";
+        }
         try {
             // Criando o objeto
             this.ieos.insertObject("Class", name);
             // Colocando o nome (Classifier) do objeto no campo 'name'
-            this.ieos.insertValue("Class", "name", name, name);
+            this.ieos.insertValue("Class", "nameClassifier", name, name);
         } catch (Exception e) {
             logger.error("Error when insert a class: " + e.getMessage());
             return false;
@@ -148,20 +161,19 @@ public class AnalisadorUmlLivro extends Analisador {
         return true;
     }
 
-    public boolean insertAssociationClass(String name, String ... ends) {
+    public boolean insertAssociationClass(String name) {
         if (this.ieos.getActualState() != 3) {
             logger.error("Error when insert an association class: the UML diagram must be created");
             return false;
+        }
+        if (name == null) {
+            name = "null";
         }
         try {
             // Criando o objeto
             this.ieos.insertObject("AssociationClass", name);
             // Colocando o nome (Classifier) do objeto no campo 'name'
-            this.ieos.insertValue("AssociationClass", "name", name, name);
-
-            for (String end : ends) {
-                this.ieos.insertLink("AssociationEnd", end, "associationEnds", "association", name, "AssociationClass");
-            }
+            this.ieos.insertValue("AssociationClass", "nameClassifier", name, name);
         } catch (Exception e) {
             logger.error("Error when insert an association class: " + e.getMessage());
             return false;
@@ -174,13 +186,19 @@ public class AnalisadorUmlLivro extends Analisador {
             logger.error("Error when insert a set: the UML diagram must be created");
             return false;
         }
+//        if (name == null) {
+//            name = "OCLVoid";
+//        }
+//        if (elementType == null) {
+//            elementType = "OCLVoid";
+//        }
         try {
             // Criando o objeto
-            this.ieos.insertObject("MySet", name);
+            this.ieos.insertObject("Set", name);
             // Colocando o nome (Classifier) do objeto no campo 'name'
-            this.ieos.insertValue("MySet", "name", name, name);
+            this.ieos.insertValue("Set", "nameClassifier", name, name);
             // Colocando o link com o Classifier correto
-            this.ieos.insertLink("MySet", name, "setA", "elementType", elementType, "Classifier");
+            this.ieos.insertLink("Set", name, "", "elementType", elementType, "Classifier");
         } catch (Exception e) {
             logger.error("Error when insert an association class: " + e.getMessage());
             return false;
@@ -193,18 +211,31 @@ public class AnalisadorUmlLivro extends Analisador {
             logger.error("Error when insert an attribute: the UML diagram must be created");
             return false;
         }
+        if (type == null) {
+            type = "null";
+        }
         try {
             // Criando o objeto
             this.ieos.insertObject("Attribute", name);
             // Colocando o nome (Typed) do objeto no campo 'name'
-            this.ieos.insertValue("Attribute", "name", name, type);
+            this.ieos.insertValue("Attribute", "nameTyped", name, type);
             // Colocando a visibilidade (Feature) do objeto no campo 'visibility'
             this.ieos.insertValue("Attribute", "visibility", name, visibility);
-             // Colocando o tipo do objeto no campo 'type'
+//             // Colocando o tipo do objeto no campo 'type'
             this.ieos.insertValue("Attribute", "type", name, type);
 
-            this.ieos.insertLink("Attribute", name, "feature", "class", className, "Class");
-
+            // Faz a relação (composição) deste objeto com uma classe ou classe associativa
+            if (isClass) {
+                this.ieos.insertLink("Attribute", name, "feature", "class", className, "Class");
+                //Novo
+                this.ieos.insertLink("Attribute", name, "feature", "associationClass", "nullAC", "AssociationClass");
+//                this.ieos.insertLink("Attribute", name, "feature", "associationClass", "null", "OCLVoid");
+            } else {
+                this.ieos.insertLink("Attribute", name, "feature", "associationClass", className, "AssociationClass");
+                //Novo
+                this.ieos.insertLink("Attribute", name, "feature", "class", "nullC", "Class");
+//                this.ieos.insertLink("Attribute", name, "feature", "class", "null", "OCLVoid");
+            }
         } catch (Exception e) {
             logger.error("Error when insert an operation: " + e.getMessage());
             return false;
@@ -217,18 +248,31 @@ public class AnalisadorUmlLivro extends Analisador {
             logger.error("Error when insert an operation: the UML diagram must be created");
             return false;
         }
+        if (returnType == null) {
+            returnType = "null";
+        }
         try {
             // Criando o objeto
             this.ieos.insertObject("Operation", name);
             // Colocando o nome (Typed) do objeto no campo 'name'
-            this.ieos.insertValue("Operation", "name", name, returnType);
+            this.ieos.insertValue("Operation", "nameTyped", name, returnType);
             // Colocando a visibilidade (Feature) do objeto no campo 'visibility'
             this.ieos.insertValue("Operation", "visibility", name, visibility);
-             // Colocando o tipo de retorno do objeto no campo 'returnType'
+//             // Colocando o tipo de retorno do objeto no campo 'returnType'
             this.ieos.insertValue("Operation", "returnType", name, returnType);
 
-            this.ieos.insertLink("Operation", name, "feature", "class", className, "Class");
-
+            // Faz a relação (composição) deste objeto com uma classe ou classe associativa
+            if (isClass) {
+                this.ieos.insertLink("Operation", name, "feature", "class", className, "Class");
+                //Novo
+                this.ieos.insertLink("Operation", name, "feature", "associationClass", "nullAC", "AssociationClass");
+//                this.ieos.insertLink("Operation", name, "feature", "associationClass", "null", "OCLVoid");
+            } else {
+                this.ieos.insertLink("Operation", name, "feature", "associationClass", className, "AssociationClass");
+                //Novo
+                this.ieos.insertLink("Operation", name, "feature", "class", "nullC", "Class");
+//                this.ieos.insertLink("Operation", name, "feature", "class", "null", "OCLVoid");
+            }
         } catch (Exception e) {
             logger.error("Error when insert an operation: " + e.getMessage());
             return false;
@@ -241,14 +285,22 @@ public class AnalisadorUmlLivro extends Analisador {
             logger.error("Error when insert a parameter: the UML diagram must be created");
             return false;
         }
+//        if (name == null) {
+//            name = "OCLVoid";
+//        }
+//        if (type == null) {
+//            type = "OCLVoid";
+//        }
+//        if (operationName == null) {
+//            operationName = "OCLVoid";
+//        }
         try {
             // Criando o objeto
             this.ieos.insertObject("Parameter", name);
             // Colocando o nome (Typed) do objeto no campo 'name'
-            this.ieos.insertValue("Parameter", "name", name, type);
+            this.ieos.insertValue("Parameter", "nameTyped", name, type);
             // Faz a relação (composição) deste objeto com uma operacao
             this.ieos.insertLink("Parameter", name, "parameter", "operation", operationName, "Operation");
-
         } catch (Exception e) {
             logger.error("Error when insert a parameter: " + e.getMessage());
             return false;
@@ -265,7 +317,7 @@ public class AnalisadorUmlLivro extends Analisador {
             // Criando o objeto
             this.ieos.insertObject("AssociationEnd", name);
             // Colocando o nome (Typed) do objeto no campo 'name'
-            this.ieos.insertValue("AssociationEnd", "name", name, name);
+            this.ieos.insertValue("AssociationEnd", "nameTyped", name, (type == null ? "OCLVoid" : type));
             
             this.ieos.insertLink("AssociationEnd", name, "types", "classifier", type, "Classifier");
 
@@ -284,8 +336,18 @@ public class AnalisadorUmlLivro extends Analisador {
             }
             this.ieos.insertValue("AssociationEnd", "composition", name, compositionString);
 
-            this.ieos.insertLink("AssociationEnd", name, "feature", "class", className, "Class");
-
+            // Faz a relação (composição) deste objeto com uma classe ou classe associativa
+            if (isClass) {
+                this.ieos.insertLink("AssociationEnd", name, "feature", "class", className, "Class");
+                //Novo
+                this.ieos.insertLink("AssociationEnd", name, "feature", "associationClass", "nullAC", "AssociationClass");
+//                this.ieos.insertLink("AssociationEnd", name, "feature", "associationClass", "null", "OCLVoid");
+            } else {
+                this.ieos.insertLink("AssociationEnd", name, "feature", "associationClass", className, "AssociationClass");
+                //Novo
+                this.ieos.insertLink("AssociationEnd", name, "feature", "class", "nullC", "Class");
+//                this.ieos.insertLink("AssociationEnd", name, "feature", "class", "null", "OCLVoid");
+            }
         } catch (Exception e) {
             logger.error("Error when insert an associationEnd: " + e.getMessage());
             return false;
@@ -298,6 +360,9 @@ public class AnalisadorUmlLivro extends Analisador {
             logger.error("Error when insert an association: the UML diagram must be created");
             return false;
         }
+//        if (name == null) {
+//            name = "OCLVoid";
+//        }
         try {
             if (associationEndsName.length < 2) {
                 throw new Exception("Association can't have less than 2 AssociationEnd");
@@ -308,6 +373,7 @@ public class AnalisadorUmlLivro extends Analisador {
 
             // Faz a relação entre este objeto e os fins de associação, que tem o minimo de 2
             for (String associationEndName : associationEndsName) {
+//                this.ieos.insertLink("Association", name, "association", "associationEnds", associationEndName, "AssociationEnd");
                 this.ieos.insertLink("AssociationEnd", associationEndName, "associationEnds", "association", name, "Association");
             }
         } catch (Exception e) {
@@ -322,8 +388,15 @@ public class AnalisadorUmlLivro extends Analisador {
             logger.error("Error when insert a link between associationEnds: the UML diagram must be created");
             return false;
         }
+//        if (associationEnd == null) {
+//            associationEnd = "OCLVoid";
+//        }
+//        if (otherEnd == null) {
+//            otherEnd = "OCLVoid";
+//        }
         try {
             this.ieos.insertLink("AssociationEnd", associationEnd, "others", "otherEnd", otherEnd, "AssociationEnd");
+//            this.ieos.insertLink("AssociationEnd", otherEnd, "", "otherEnd", associationEnd, "AssociationEnd");
         } catch (Exception e) {
             logger.error("Error when insert a link between associationEnds: " + e.getMessage());
             return false;

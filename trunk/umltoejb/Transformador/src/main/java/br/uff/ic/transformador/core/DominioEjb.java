@@ -2,9 +2,9 @@ package br.uff.ic.transformador.core;
 
 import core.XEOS;
 
-public class AnalisadorEjb extends Analisador {
+public class DominioEjb extends Dominio {
 
-    public AnalisadorEjb(XEOS ieos) {
+    public DominioEjb(XEOS ieos) {
         super(ieos);
     }
 
@@ -53,10 +53,10 @@ public class AnalisadorEjb extends Analisador {
         /* associations */
         this.ieos.insertAssociation("EJBClassifier", "type", "1", "*", "typed", "EJBTyped");
         this.ieos.insertAssociation("EJBDataSchema", "package", "1", "*", "element", "EJBDataSchemaElement");
-        this.ieos.insertAssociation("EJBClass", "class", "1", "*", "feature", "EJBFeature");
+        this.ieos.insertAssociation("EJBClass", "class", "1", "0..*", "feature", "EJBFeature");
         this.ieos.insertAssociation("EJBEntityComponent", "entityComp", "1", "1..*", "usedTable", "Table");
         this.ieos.insertAssociation("EJBDataAssociation", "association", "0..1", "2", "associationEnds", "EJBAssociationEnd");
-        this.ieos.insertAssociation("BusinessMethod", "operation", "1", "*", "parameter", "EJBParameter");
+        this.ieos.insertAssociation("BusinessMethod", "operation", "1", "0..*", "parameter", "EJBParameter");
 
         /* attributes */
         this.ieos.insertAttribute("EJBClassifier", "nameClassifier", "String");
@@ -164,6 +164,7 @@ public class AnalisadorEjb extends Analisador {
         return true;
     }
 
+    //OK
     public boolean insertEJBKeyClass(String name) {
         if (this.ieos.getActualState() != 3) {
             logger.error("Error when insert an EJBKeyClass: the security diagram must be created");
@@ -178,8 +179,8 @@ public class AnalisadorEjb extends Analisador {
                 myName = name;
             }
 
-            this.ieos.insertObject("EJBKeyClass", myName + "EKC");
-            this.ieos.insertValue("EJBKeyClass", "nameClassifier", myName + "EKC", myName);
+            this.ieos.insertObject("EJBKeyClass", myName);
+            this.ieos.insertValue("EJBKeyClass", "nameClassifier", myName, myName);
         } catch (Exception e) {
             logger.error("Error when insert an EJBKeyClass: " + e.getMessage());
             return false;
@@ -356,6 +357,7 @@ public class AnalisadorEjb extends Analisador {
         return true;
     }
 
+    //OK
     public boolean insertEJBAttribute(String name, String visibility, String type, String ejbClassName) {
         if (this.ieos.getActualState() != 3) {
             logger.error("Error when insert an EJBAttribute: the security diagram must be created");
@@ -370,10 +372,10 @@ public class AnalisadorEjb extends Analisador {
                 myName = name;
             }
 
-            this.ieos.insertObject("EJBAttribute", myName + "EA");
-            this.ieos.insertValue("EJBAttribute", "nameTyped", myName + "EA", myName);
-            this.ieos.insertValue("EJBAttribute", "visibility", myName + "EA", visibility);
-            this.ieos.insertValue("EJBAttribute", "type", myName + "EA", type);
+            this.ieos.insertObject("EJBAttribute", myName);
+            this.ieos.insertValue("EJBAttribute", "nameTyped", myName, myName);
+            this.ieos.insertValue("EJBAttribute", "visibility", myName, visibility);
+            this.ieos.insertValue("EJBAttribute", "type", myName, type);
 
             String className = null;
             if (ejbClassName == null) {
@@ -381,7 +383,7 @@ public class AnalisadorEjb extends Analisador {
             } else {
                 className = ejbClassName;
             }
-            this.ieos.insertLink("EJBAttribute", myName + "EA", "feature", "class", className, "EJBClass");
+            this.ieos.insertLink("EJBAttribute", myName, "feature", "class", className, "EJBClass");
         } catch (Exception e) {
             logger.error("Error when insert an EJBAttribute: " + e.getMessage());
             return false;
