@@ -21,8 +21,8 @@
     </build>
     <dependencies>
         <dependency>
-            <groupId>br.uff.ic</groupId>
-            <artifactId>Transformador</artifactId>
+            <groupId>br.uff.ic.mda</groupId>
+            <artifactId>transformator</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <!-- Log -->
