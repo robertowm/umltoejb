@@ -8,6 +8,15 @@ public abstract class MergedDomain extends Domain {
     /* Attributes */
     protected List<Domain> domains;
 
+    /* Constructors */
+    public MergedDomain(ModelPersistence modelPersistence) {
+        super(modelPersistence);
+    }
+
+    public MergedDomain(ModelPersistence modelPersistence, List<DomainValidator> domainValidators) {
+        super(modelPersistence, domainValidators);
+    }
+
     /* Methods for the list 'domains' */
     public boolean addDomain(Domain domain) {
         if (this.domains == null) {
