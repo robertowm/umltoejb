@@ -1,12 +1,12 @@
-package br.uff.ic.transformador.core;
+package br.uff.ic.mda.transformador;
 
 /**
  *
  * @author robertowm
  */
-public class TransformadorUmlEjb extends Transformador<DominioUmlLivro, DominioEjb, DominioUmlEjb> {
+public class TransformadorUmlEjb extends Transformador<DominioUml, DominioEjb, DominioUmlEjb> {
 
-    public TransformadorUmlEjb(DominioUmlLivro dUml, DominioEjb dEjb, DominioUmlEjb dUmlEjb) {
+    public TransformadorUmlEjb(DominioUml dUml, DominioEjb dEjb, DominioUmlEjb dUmlEjb) {
         super(dUml, dEjb, dUmlEjb);
     }
 
@@ -29,8 +29,8 @@ public class TransformadorUmlEjb extends Transformador<DominioUmlLivro, DominioE
     private void criaEjbKeyClassDeUmlClass(String umlClassName) {
         String ejbKeyClassName = umlClassName + "Key";
         String ejbAttributeName = umlClassName + "ID";
-        destino.insertEJBKeyClass(ejbKeyClassName);
-        destino.insertEJBAttribute(ejbAttributeName, "private", "int", ejbKeyClassName);
+//        destino.insertEJBKeyClass(ejbKeyClassName);
+//        destino.insertEJBAttribute(ejbAttributeName, "private", "int", ejbKeyClassName);
     }
 
 //    private void transformaUmlAssociationClassEmEJBKeyClass() throws Exception {

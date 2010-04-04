@@ -1,4 +1,4 @@
-package br.uff.ic.transformador.core;
+package br.uff.ic.mda.transformador;
 
 import br.uff.ic.transformador.core.sintaxe.java.Atributo;
 import br.uff.ic.transformador.core.sintaxe.java.Classe;
