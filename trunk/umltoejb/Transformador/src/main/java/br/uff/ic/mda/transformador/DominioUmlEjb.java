@@ -1,4 +1,4 @@
-package br.uff.ic.transformador.core;
+package br.uff.ic.mda.transformador;
 
 import core.XEOS;
 import core.exception.XEOSException;
