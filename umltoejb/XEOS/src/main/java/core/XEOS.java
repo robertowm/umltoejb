@@ -1,5 +1,6 @@
 package core;
 
+import br.uff.ic.mda.transformator.ModelPersistence;
 import core.exception.XEOSException;
 import core.oclLex.interpreter.Interpreter;
 import core.oclLex.lexer.Lexer;
@@ -17,7 +18,7 @@ import java.util.Vector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class XEOS {
+public class XEOS implements ModelPersistence {
 
     final Logger logger = LoggerFactory.getLogger(XEOS.class);
     private State state;
@@ -308,7 +309,8 @@ public class XEOS {
         return true;
     }
 
-    public String query(String query) throws XEOSException, Exception {
+    @Override
+    public String query(String query) throws Exception {
         if (this.actualState >= 3) {
             try {
                 this.lexer = new Lexer(new PushbackReader(new StringReader(query), 1024));
