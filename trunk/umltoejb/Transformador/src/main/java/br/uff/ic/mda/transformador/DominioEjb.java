@@ -128,6 +128,9 @@ public class DominioEjb extends Dominio {
         this.ieos.insertObject("EJBClassifier", "NULL_EJBC");
         this.ieos.insertObject("EJBTyped", "NULL_EJBT");
         this.ieos.insertObject("BusinessMethod", "NULL_BM");
+
+        this.ieos.insertObject("EJBDataType", "EJBInteger");
+        this.ieos.insertValue("EJBDataType", "name", "EJBInteger", "Integer");
     }
 
     // Metodos especificos do metamodelo

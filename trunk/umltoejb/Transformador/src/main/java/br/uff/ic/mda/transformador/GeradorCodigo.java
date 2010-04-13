@@ -37,6 +37,10 @@ public abstract class GeradorCodigo<T extends Dominio> {
                 return resultado.substring(inicio+1,resultado.length()).replace("{","").replace("}","").replace(" ", "").replace("'","").split(",");
             }
         }
-        return resultado.substring(inicio+1, fim).replace("{","").replace("}","").replace(" ", "").replace("'","").split(",");
+        String[] result = resultado.substring(inicio+1, fim).replace("{","").replace("}","").replace(" ", "").replace("'","").split(",");
+        if (result.length == 1 && "".equals(result[0].trim())) {
+            return new String[0];
+        }
+        return result;
     }
 }

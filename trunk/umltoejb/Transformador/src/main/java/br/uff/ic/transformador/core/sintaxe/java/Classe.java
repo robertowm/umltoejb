@@ -9,14 +9,6 @@ import java.util.List;
  * @author robertowm
  */
 public class Classe implements Persistente {
-    
-    /* Constantes de uma Class */
-    private static final String ATALHO_PACOTE = "/*###pacote###*/";
-    private static final String ATALHO_NOME_CLASSE = "/*###nomeclasse###*/";
-    private static final String ATALHO_EXTENDS = "/*###extends###*/";
-    private static final String ATALHO_IMPLEMENTS = "/*###implements###*/";
-    private static final String ATALHO_ATRIBUTOS = "/*###atributos###*/";
-    private static final String ATALHO_METODOS = "/*###metodos###*/";
 
     private String caminhoPacote;
     private String nome;
@@ -25,6 +17,8 @@ public class Classe implements Persistente {
     private String nomeClasseEstende;
     private List<String> nomesClassesImplementa;
     private List<Atributo> atributos;
+    private List<String> caminhosImport;
+    private List<Construtor> construtores;
 //    private List<Metodo> metodos;
 
     protected Classe() {
@@ -36,11 +30,18 @@ public class Classe implements Persistente {
 
         StringBuffer sb = new StringBuffer();
 
-        if (caminhoPacote != null && "".equals(caminhoPacote.trim())) {
+        if (caminhoPacote != null && !"".equals(caminhoPacote.trim())) {
             sb.append("package " + caminhoPacote + ";\n\n");
         }
 
-        if (visibilidade != null && "".equals(visibilidade.trim())) {
+        if (caminhosImport != null && !caminhosImport.isEmpty()) {
+            for (String string : caminhosImport) {
+                sb.append("import " + string + ";\n");
+            }
+            sb.append("\n");
+        }
+
+        if (visibilidade != null && !"".equals(visibilidade.trim())) {
             sb.append(visibilidade + " ");
         }
 
@@ -50,12 +51,12 @@ public class Classe implements Persistente {
 
         sb.append("class " + nome);
 
-        if (nomeClasseEstende != null && "".equals(nomeClasseEstende.trim())) {
+        if (nomeClasseEstende != null && !"".equals(nomeClasseEstende.trim())) {
             sb.append(" extends " + nomeClasseEstende);
         }
 
         if (nomesClassesImplementa != null && !nomesClassesImplementa.isEmpty()) {
-            sb.append(" extends ");
+            sb.append(" implements ");
             for (int i = 0; i < nomesClassesImplementa.size() - 1; i++) {
                 sb.append(nomesClassesImplementa.get(i) + ", ");
             }
@@ -67,6 +68,14 @@ public class Classe implements Persistente {
         if (atributos != null) {
             for (Atributo atributo : atributos) {
                 sb.append(atributo.serialize() + "\n");
+            }
+            sb.append("\n");
+        }
+
+
+        if (construtores != null) {
+            for (Construtor construtor : construtores) {
+                sb.append(construtor.serialize() + "\n");
             }
         }
 
@@ -141,6 +150,30 @@ public class Classe implements Persistente {
             atributos = new ArrayList<Atributo>();
         }
         atributos.add(atributo);
+        return this;
+    }
+
+    public List<String> getImports() {
+        return this.caminhosImport;
+    }
+
+    public Classe addImport(String caminhoImport) {
+        if (caminhosImport == null) {
+            caminhosImport = new ArrayList<String>();
+        }
+        caminhosImport.add(caminhoImport);
+        return this;
+    }
+
+    public List<Construtor> getConstrutores() {
+        return this.construtores;
+    }
+
+    public Classe addConstrutor(Construtor construtor) {
+        if (construtores == null) {
+            construtores = new ArrayList<Construtor>();
+        }
+        construtores.add(construtor);
         return this;
     }
 }
