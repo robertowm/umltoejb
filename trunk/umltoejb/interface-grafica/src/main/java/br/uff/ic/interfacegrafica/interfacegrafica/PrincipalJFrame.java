@@ -5,8 +5,12 @@
  */
 package br.uff.ic.interfacegrafica.interfacegrafica;
 
+import br.uff.ic.mda.transformador.ContratoTransformacao;
 import br.uff.ic.mda.transformador.DominioEjb;
 import br.uff.ic.mda.transformador.DominioUml;
+import br.uff.ic.mda.transformador.DominioUmlEjb;
+import br.uff.ic.mda.transformador.GeradorCodigoEjb;
+import br.uff.ic.mda.transformador.TransformadorUmlEjb;
 import core.XEOS;
 import core.exception.XEOSException;
 import java.awt.Graphics;
@@ -25,8 +29,6 @@ public class PrincipalJFrame extends javax.swing.JFrame {
     private XEOS xeos;
 
     private void criarDiagramaObjetosEjb() throws Exception {
-        aEjb.createSpecificationOfCurrentDiagram();
-
         aEjb.insertEJBDataSchema("standardBreakfast_DS_ID", "standardBreakfast");
         aEjb.insertEJBDataSchema("comestible_DS_ID", "comestible");
 
@@ -74,8 +76,6 @@ public class PrincipalJFrame extends javax.swing.JFrame {
     }
 
     private void criarDiagramaObjetosUml() throws Exception {
-        aUml.createSpecificationOfCurrentDiagram();
-
         aUml.insertClass("Customer_ID", "Customer");
         aUml.insertClass("BreakfastOrder_ID", "BreakfastOrder");
         aUml.insertClass("Breakfast_ID", "Breakfast");
@@ -115,7 +115,7 @@ public class PrincipalJFrame extends javax.swing.JFrame {
 
         aUml.insertAssociationEnd("standardsC_ID", "standardsC", "public", "StandardBreakfast_ID", "0", "*", false, "Comestible_ID");
         aUml.insertAssociationEnd("comestibleSB_ID", "comestibleSB", "public", "Comestible_ID", "1", "*", false, "StandardBreakfast_ID");
-        aUml.insertLinksBetweenAssociationEnds("standardsPC_ID", "comestiblePC_ID");
+        aUml.insertLinksBetweenAssociationEnds("standardsC_ID", "comestibleSB_ID");
         aUml.insertAssociationClass("PartClass_ID", "PartClass", "standardsC_ID", "comestibleSB_ID");
         aUml.insertAttribute("quantityPC_ID", "quantityPC", "public", "Integer", "PartClass_ID");
 
@@ -134,13 +134,13 @@ public class PrincipalJFrame extends javax.swing.JFrame {
         initComponents();
 
         xeos = new XEOS();
-//        DominioUmlEjb aJuncao = null;
+        DominioUmlEjb aJuncao = null;
         try {
             xeos.createClassDiagram();
 
             aUml = new DominioUml(xeos);
-//            aEjb = new DominioEjb(xeos);
-//            aJuncao = new DominioUmlEjb(xeos);
+            aEjb = new DominioEjb(xeos);
+            aJuncao = new DominioUmlEjb(xeos);
 
             xeos.closeClassDiagram();
         } catch (XEOSException ex) {
@@ -150,6 +150,10 @@ public class PrincipalJFrame extends javax.swing.JFrame {
 
         try {
             xeos.createObjectDiagram();
+
+            aUml.createSpecificationOfCurrentDiagram();
+            aEjb.createSpecificationOfCurrentDiagram();
+            aJuncao.createSpecificationOfCurrentDiagram();
 
             criarDiagramaObjetosUml();
 //            criarDiagramaObjetosEjb();
