@@ -42,7 +42,11 @@ public class Atributo implements NaoPersistente {
     }
 
     public Atributo setNome(String nome) {
-        this.nome = nome;
+        return setNome(nome, false);
+    }
+
+    public Atributo setNome(String nome, boolean lowerFirstLetter) {
+        this.nome = (lowerFirstLetter) ? lowerFirstLetter(nome) : nome;
         return this;
     }
 
@@ -53,10 +57,11 @@ public class Atributo implements NaoPersistente {
     @Override
     public StringBuffer serialize() {
         StringBuffer sb = new StringBuffer();
-        if (visibilidade != null && "".equals(visibilidade.trim())) {
+        sb.append("\t");
+        if (visibilidade != null && !"".equals(visibilidade.trim())) {
             sb.append(visibilidade + " ");
         }
-        sb.append(tipo + " " + lowerFirstLetter(nome) + ";");
+        sb.append(tipo + " " + nome + ";");
         return sb;
     }
 

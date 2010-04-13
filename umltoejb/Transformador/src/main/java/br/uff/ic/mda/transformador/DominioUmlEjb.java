@@ -29,12 +29,18 @@ public class DominioUmlEjb extends Dominio {
         logger.debug("Inserting Uml MetaModel Structure");
 
         this.ieos.insertClass("UMLClassToEJBKeyClass");
+        this.ieos.insertClass("UMLAssociationClassToEJBKeyClass");
 
-        this.ieos.insertAssociation("Class", "class", "1", "1", "transformer", "UMLClassToEJBKeyClass");
-        this.ieos.insertAssociation("EJBAttribute", "id", "1", "1", "transformer", "UMLClassToEJBKeyClass");
-        this.ieos.insertAssociation("EJBKeyClass", "keyClass", "1", "1", "transformer", "UMLClassToEJBKeyClass");
+        this.ieos.insertAssociation("Class", "class", "1", "1", "transformerToClass", "UMLClassToEJBKeyClass");
+        this.ieos.insertAssociation("EJBAttribute", "id", "1", "1", "transformerToClassToClass", "UMLClassToEJBKeyClass");
+        this.ieos.insertAssociation("EJBKeyClass", "keyClass", "1", "1", "transformerToClass", "UMLClassToEJBKeyClass");
+
+        this.ieos.insertAssociation("AssociationClass", "class", "1", "1", "transformerToAssociationClass", "UMLAssociationClassToEJBKeyClass");
+        this.ieos.insertAssociation("EJBAttribute", "id", "2", "1", "transformerToAssociationClass", "UMLAssociationClassToEJBKeyClass");
+        this.ieos.insertAssociation("EJBKeyClass", "keyClass", "1", "1", "transformerToAssociationClass", "UMLAssociationClassToEJBKeyClass");
 
         this.ieos.insertAttribute("UMLClassToEJBKeyClass", "name", "String");
+        this.ieos.insertAttribute("UMLAssociationClassToEJBKeyClass", "name", "String");
 
     }
 
@@ -53,19 +59,41 @@ public class DominioUmlEjb extends Dominio {
 
     }
 
-    public boolean insertUMLClassToEJBKeyClass(String nameUMLClass, String nameEJBKeyClass, String nameEJBAttribute) {
+    public boolean insertUMLClassToEJBKeyClass(String idUMLClass, String idEJBKeyClass, String idEJBAttribute) {
         if (this.ieos.getActualState() != 3) {
             logger.error("Error when insert a class: the UML diagram must be created");
             return false;
         }
         try {
-            String name = nameUMLClass + "To" + nameEJBKeyClass;
+            String name = idUMLClass + "To" + idEJBKeyClass;
             this.ieos.insertObject("UMLClassToEJBKeyClass", name);
             this.ieos.insertValue("UMLClassToEJBKeyClass", "name", name, name);
 
-            this.ieos.insertLink("Class", nameUMLClass, "class", "transformer", name, "UMLClassToEJBKeyClass");
-            this.ieos.insertLink("EJBKeyClass", nameEJBKeyClass, "keyClass", "transformer", name, "UMLClassToEJBKeyClass");
-            this.ieos.insertLink("EJBAttribute", nameEJBAttribute, "id", "transformer", name, "UMLClassToEJBKeyClass");
+            this.ieos.insertLink("Class", idUMLClass, "class", "transformer", name, "UMLClassToEJBKeyClass");
+            this.ieos.insertLink("EJBKeyClass", idEJBKeyClass, "keyClass", "transformer", name, "UMLClassToEJBKeyClass");
+            this.ieos.insertLink("EJBAttribute", idEJBAttribute, "id", "transformer", name, "UMLClassToEJBKeyClass");
+        } catch (Exception e) {
+            logger.error("Error when insert a class: " + e.getMessage());
+            return false;
+        }
+        return true;
+    }
+
+    public boolean insertUMLAssociationClassToEJBKeyClass(String idUMLClass, String idEJBKeyClass, String... idsEJBAttribute) {
+        if (this.ieos.getActualState() != 3) {
+            logger.error("Error when insert a class: the UML diagram must be created");
+            return false;
+        }
+        try {
+            String name = idUMLClass + "To" + idEJBKeyClass;
+            this.ieos.insertObject("UMLClassToEJBKeyClass", name);
+            this.ieos.insertValue("UMLClassToEJBKeyClass", "name", name, name);
+
+            this.ieos.insertLink("Class", idUMLClass, "class", "transformer", name, "UMLClassToEJBKeyClass");
+            this.ieos.insertLink("EJBKeyClass", idEJBKeyClass, "keyClass", "transformer", name, "UMLClassToEJBKeyClass");
+            for (String id : idsEJBAttribute) {
+                this.ieos.insertLink("EJBAttribute", id, "id", "transformer", name, "UMLClassToEJBKeyClass");
+            }
         } catch (Exception e) {
             logger.error("Error when insert a class: " + e.getMessage());
             return false;

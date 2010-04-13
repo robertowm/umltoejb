@@ -2,6 +2,7 @@ package br.uff.ic.mda.transformador;
 
 import br.uff.ic.transformador.core.sintaxe.java.Atributo;
 import br.uff.ic.transformador.core.sintaxe.java.Classe;
+import br.uff.ic.transformador.core.sintaxe.java.Construtor;
 import br.uff.ic.transformador.core.sintaxe.java.SintaxeJava;
 
 /**
@@ -22,23 +23,53 @@ public class GeradorCodigoEjb extends GeradorCodigo<DominioEjb> {
     }
 
     private void gerarEJBKeyClass() throws Exception {
-        String[] ids = this.tratarResultadoQuery(this.dominio.query("EJBKeyClass.allInstances()"));
+        String query = this.dominio.query("EJBKeyClass.allInstances()");
+        String[] ids = this.tratarResultadoQuery(query);
+//        String[] ids = this.tratarResultadoQuery(this.dominio.query("EJBKeyClass.allInstances()"));
 
         for (String id : ids) {
-            Classe classe = SintaxeJava.getJavaClass();
-            classe.setNome(this.dominio.query(id + ".nameClassifier").replace("'", ""));
+            try {
+                String idClasse = id.replace("'", "").trim();
 
-            String[] idsAttr = this.tratarResultadoQuery(this.dominio.query("EJBAttribute.allInstances()->select(attr | attr.class->includes(" + id + "))"));
-            for (String idAttr : idsAttr) {
-                Atributo atributo = SintaxeJava.getJavaAttribute();
-                atributo.setVisibilidade(this.dominio.query(idAttr + ".visibility").replace("'", ""));
-                atributo.setTipo(this.dominio.query(idAttr + ".type").replace("'", ""));
-                atributo.setNome(this.dominio.query(idAttr + ".nameTyped").replace("'", ""));
+                Classe classe = SintaxeJava.getJavaClass();
+                
+                query = idClasse + ".name";
+                
+                classe.setNome(this.dominio.query(query).replace("'", ""));
+                classe.addNomeClasseQueImplementa("java.io.Serializable");
+                classe.addConstrutor(new Construtor(classe.getNome(), ""));
+                classe.setVisibilidade("public");
 
-                classe.addAtributo(atributo);
+                query = "EJBAttribute.allInstances()->select(attr | attr.class->includes(" + idClasse + "))->asSet()";
+                String[] idsAttr = this.tratarResultadoQuery(this.dominio.query(query));
+
+                for (String idAttr : idsAttr) {
+                    String idAtributo = idAttr.replace("'", "").trim();
+                    Atributo atributo = SintaxeJava.getJavaAttribute();
+//                atributo.setVisibilidade(this.dominio.query(idAttr + ".visibility").replace("'", ""));
+                    atributo.setVisibilidade("public");
+                    query = idAtributo + ".type->asOrderedSet()->first().name";
+                    atributo.setTipo(this.dominio.query(query).replace("'",""));
+                    query = idAtributo + ".name";
+                    atributo.setNome(this.dominio.query(query).replace("'", ""), true);
+
+                    classe.addAtributo(atributo);
+                }
+
+                StringBuffer codigo = new StringBuffer();
+                for (Atributo atributo : classe.getAtributos()) {
+                    codigo.append("this." + atributo.getNome() + " = " + atributo.getNome() + ";\n");
+                }
+
+                classe.addConstrutor(new Construtor(classe.getNome(), codigo.toString(), classe.getAtributos()));
+
+                classe.persiste();
+            } catch (Exception ex) {
+                System.out.println("-------------------------------------------");
+//                System.out.println("[ERRO] Query n‹o foi executada: " + query);
+                ex.printStackTrace();
+                System.out.println("-------------------------------------------");
             }
-
-            classe.persiste();
         }
     }
 }
