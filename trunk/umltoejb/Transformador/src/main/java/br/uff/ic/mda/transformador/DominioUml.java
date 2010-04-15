@@ -152,7 +152,7 @@ public class DominioUml extends Dominio {
                 "endif", new Object[0]);
 
         if (!result) {
-            throw new Exception("It was not possible to insert all the operations in the SecureUML model");
+            throw new Exception("It was not possible to insert all the operations in the UML model");
         }
 
         return result;
@@ -293,8 +293,8 @@ public class DominioUml extends Dominio {
             // Colocando a visibilidade (Feature) do objeto no campo 'visibility'
             this.ieos.insertValue("Attribute", "visibility", id, visibility == null ? "" : visibility);
 
-            this.ieos.insertLink("AssociationEnd", id, "types", "classifier", type, "Classifier");
-            this.ieos.insertLink("Attribute", name, "feature", "class", classId, "Class");
+            this.ieos.insertLink("Attribute", id, "types", "classifier", type, "Classifier");
+            this.ieos.insertLink("Attribute", id, "feature", "class", classId, "Class");
 
         } catch (Exception e) {
             logger.error("Error when insert an operation: " + e.getMessage());

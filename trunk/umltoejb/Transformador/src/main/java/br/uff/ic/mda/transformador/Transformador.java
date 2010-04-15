@@ -39,7 +39,11 @@ public abstract class Transformador<DomOr extends Dominio, DomDest extends Domin
                 return resultado.substring(inicio+1,resultado.length()).replace("{","").replace("}","").replace(" ", "").replace("'","").split(",");
             }
         }
-        return resultado.substring(inicio+1, fim).replace("{","").replace("}","").replace(" ", "").replace("'","").split(",");
+        String[] result = resultado.substring(inicio+1, fim).replace("{","").replace("}","").replace(" ", "").replace("'","").split(",");
+        if (result != null && result.length == 1 && "".equals(result[0])) {
+            return new String[0];
+        }
+        return result;
     }
 
 }
