@@ -5,11 +5,8 @@ import core.exception.XEOSException;
 
 public class DominioUml extends Dominio {
 
-    private int count;
-
-    public DominioUml(XEOS ieos) {
+    public DominioUml(XEOS ieos) throws Exception {
         super(ieos);
-        count = 0;
     }
 
     @Override
@@ -19,22 +16,22 @@ public class DominioUml extends Dominio {
         this.ieos.insertObject("Operation", "NULL_OPERATION");
         this.ieos.insertObject("Association", "NULL_ASSOCIATION");
 
-        this.ieos.insertObject("DataType", "Integer");
-        this.ieos.insertValue("DataType", "name", "Integer", "Integer");
-        this.ieos.insertObject("DataType", "Double");
-        this.ieos.insertValue("DataType", "name", "Double", "Double");
-        this.ieos.insertObject("DataType", "Real");
-        this.ieos.insertValue("DataType", "name", "Real", "Real");
-        this.ieos.insertObject("DataType", "String");
-        this.ieos.insertValue("DataType", "name", "String", "String");
-        this.ieos.insertObject("DataType", "Date");
-        this.ieos.insertValue("DataType", "name", "Date", "Date");
-        this.ieos.insertObject("DataType", "Boolean");
-        this.ieos.insertValue("DataType", "name", "Boolean", "Boolean");
+        this.ieos.insertObject("DataType", "UMLInteger");
+        this.ieos.insertValue("DataType", "name", "UMLInteger", "Integer");
+        this.ieos.insertObject("DataType", "UMLDouble");
+        this.ieos.insertValue("DataType", "name", "UMLDouble", "Double");
+        this.ieos.insertObject("DataType", "UMLReal");
+        this.ieos.insertValue("DataType", "name", "UMLReal", "Real");
+        this.ieos.insertObject("DataType", "UMLString");
+        this.ieos.insertValue("DataType", "name", "UMLString", "String");
+        this.ieos.insertObject("DataType", "UMLDate");
+        this.ieos.insertValue("DataType", "name", "UMLDate", "Date");
+        this.ieos.insertObject("DataType", "UMLBoolean");
+        this.ieos.insertValue("DataType", "name", "UMLBoolean", "Boolean");
     }
 
     @Override
-    protected void insertMetamodelInvariants() throws Exception {
+    public void insertMetamodelInvariants() throws Exception {
         logger.debug("Inserting Uml MetaModel Invariants");
 
         // Classes associativas nao podem ter um AssociationEnd vinculado a ela (devido a ser uma Association) que possua composition = true
@@ -75,7 +72,7 @@ public class DominioUml extends Dominio {
     }
 
     @Override
-    protected boolean insertMetamodelOperations() throws Exception {
+    public boolean insertMetamodelOperations() throws Exception {
         logger.debug("Inserting Uml MetaModel Operations");
         boolean result = true;
 
@@ -83,73 +80,137 @@ public class DominioUml extends Dominio {
         String[] param;
 
         result &= this.ieos.insertOperation("Class", "getAllContained", "Set(Class)",
-            "if contained->includes(self) then " +
-                "contained->asSet() " +
-            "else " +
-                "self.feature" +
-                    "->select(f : Feature | f.oclIsKindOf(AssociationEnd))" +
-                    "->collect(f : Feature | f.oclAsType(AssociationEnd))" +
-                    "->select(ae : AssociationEnd | ae.composition = true)" +
-                    "->collect(ae : AssociationEnd | ae.classifier)" +
-                    "->select(c : Classifier | c.oclIsKindOf(Class))" +
-                    "->collect(c : Classifier| c.oclAsType(Class))" +
-                    "->iterate( cc : Class ; acc : Set(Class) = allContained " +
-                        "| allContained->union(cc.getAllContained(allContained, allContained->including(cc))))" +
-            " endif "
-            , new Object[]{new String[]{"contained","Set(Class)"}, new String[]{"allContained","Set(Class)"}});
+                "Class.allInstances()->select(c | c.subindo(c.emptySet())->includes(self))"
+                , new Object[0]);
 
+        result &= this.ieos.insertOperation("Class", "subindo", "Set(Class)",
+                "if self.oclIsTypeOf(Class) "
+                + "then self.subindoClass(lista) "
+                + "else "
+                + "self.oclAsType(AssociationClass).subindoAssociationClass(lista) "
+                + "endif", new Object[]{new String[]{"lista", "Set(Class)"}});
+
+        result &= this.ieos.insertOperation("Class", "subindoClass", "Set(Class)",
+                "if "
+                + "self.feature"
+                + "->select(f : Feature | f.oclIsKindOf(AssociationEnd))"
+                + "->collect(f : Feature | f.oclAsType(AssociationEnd))"
+                + "->exists(ae : AssociationEnd | ae.composition = true)"
+                + " then "
+                + "self.feature"
+                + "->select(f : Feature | f.oclIsKindOf(AssociationEnd))"
+                + "->collect(f : Feature | f.oclAsType(AssociationEnd))"
+                + "->select(ae : AssociationEnd | ae.composition = true)"
+                + ".classifier"
+                + "->select(c : Classifier | c.oclIsKindOf(Class))"
+                + "->collect(c : Classifier | c.oclAsType(Class))"
+                + "->asOrderedSet()"
+                + "->first()"
+                + ".subindo(lista->including(self))"
+                + " else "
+                + "lista->including(self)"
+                + " endif", new Object[]{new String[]{"lista","Set(Class)"}});
+
+        result &= this.ieos.insertOperation("AssociationClass", "subindoAssociationClass", "Set(Class)",
+                "if "
+                + "self.associationEnds->size() = 1 "
+                + "then "
+                + "self.associationEnds"
+                + "->asOrderedSet()"
+                + "->first()"
+                + ".class"
+                + "->asOrderedSet()"
+                + "->first()"
+                + ".subindo(lista->including(self))"
+                + "else "
+                + "lista->including(self) "
+                + "endif", new Object[]{new String[]{"lista", "Set(Class)"}});
+
+//        result &= this.ieos.insertOperation("Class", "getAllContained", "Set(Class)",
+//                "if contained->includes(self) then "
+//                + "contained->asSet() "
+//                + "else "
+//                + "self.feature"
+//                + "->select(f : Feature | f.oclIsKindOf(AssociationEnd))"
+//                + "->collect(f : Feature | f.oclAsType(AssociationEnd))"
+////                + "->select(ae : AssociationEnd | ae.composition = true)"
+//                + "->select(ae : AssociationEnd | ae.otherEnd->exists(oe : AssociationEnd | oe.composition = true))"
+//                + "->collect(ae : AssociationEnd | ae.classifier)"
+//                //Nova condicao - AssociationEnd que o Association eh um AssociationClass e o AssociationEnd eh direcionado
+//                + "->union(self.feature->select(f : Feature | f.oclIsKindOf(AssociationEnd))->collect(f : Feature | f.oclAsType(AssociationEnd).association)->select(assoc : Association | assoc.oclIsTypeOf(AssociationClass))->collect(assoc : Association | assoc.oclAsType(AssociationClass))->select(ac : AssociationClass | ac.associationEnds->size() = 1)->collect(ac : AssociationClass | ac.oclAsType(Classifier)))"
+//                + "->select(c : Classifier | c.oclIsKindOf(Class))"
+//                + "->collect(c : Classifier| c.oclAsType(Class))"
+//                + "->iterate( cc : Class ; acc : Set(Class) = allContained "
+//                + "| acc->union(cc.oclAsType(Class).getAllContained(cc.emptySet(), cc.emptySet()->including(cc))))"
+//                + " endif ", new Object[]{new String[]{"contained", "Set(Class)"}, new String[]{"allContained", "Set(Class)"}});
         result &= this.ieos.insertOperation("Class", "emptySet", "Set(Class)",
-            "Class.allInstances()->select(c|false) ", new Object[0]);
+                "Class.allInstances()->select(c|false) ", new Object[0]);
+
 
         result &= this.ieos.insertOperation("Class", "getOuterMostContainer", "Class",
-                "if " +
-                    "self.feature" +
-                        "->select(f : Feature | f.oclIsKindOf(AssociationEnd))" +
-                        "->collect(f : Feature | f.oclAsType(AssociationEnd))" +
-                        "->exists(ae : AssociationEnd | ae.otherEnd->exists(oe : AssociationEnd | oe.composition = true))" +
-                " then " +
-                    "self.feature" +
-                        "->select(f : Feature | f.oclIsKindOf(AssociationEnd))" +
-                        "->collect(f : Feature | f.oclAsType(AssociationEnd))" +
-                        "->select(ae : AssociationEnd | ae.otherEnd->exists(oe : AssociationEnd | oe.composition = true))" +
-                        ".classifier" +
-                        "->select(c : Classifier | c.oclIsKindOf(Class))" +
-                        "->collect(c : Classifier | c.oclAsType(Class))" +
-                        "->asOrderedSet()" +
-                        "->first()" +
-                        ".getOuterMostContainer()" +
-                " else " +
-                    "self" +
-                " endif"
-                    , new Object[0]);
+                "if self.oclIsTypeOf(Class) "
+                + "then self.getOuterMostContainerFromClass() "
+                + "else "
+                + "self.oclAsType(AssociationClass).getOuterMostContainerFromAssociationClass() "
+                + "endif", new Object[0]);
+
+        result &= this.ieos.insertOperation("Class", "getOuterMostContainerFromClass", "Class",
+                "if "
+                + "self.feature"
+                + "->select(f : Feature | f.oclIsKindOf(AssociationEnd))"
+                + "->collect(f : Feature | f.oclAsType(AssociationEnd))"
+                + "->exists(ae : AssociationEnd | ae.composition = true)"
+                + " then "
+                + "self.feature"
+                + "->select(f : Feature | f.oclIsKindOf(AssociationEnd))"
+                + "->collect(f : Feature | f.oclAsType(AssociationEnd))"
+                + "->select(ae : AssociationEnd | ae.composition = true)"
+                + ".classifier"
+                + "->select(c : Classifier | c.oclIsKindOf(Class))"
+                + "->collect(c : Classifier | c.oclAsType(Class))"
+                + "->asOrderedSet()"
+                + "->first()"
+                + ".getOuterMostContainer()"
+                + " else "
+                + "self"
+                + " endif", new Object[0]);
 
         result &= this.ieos.insertOperation("Association", "getOuterMostContainerFromAssociation", "Class",
-                "self.associationEnds" +
-                    "->select(ae : AssociationEnd | ae.otherEnd->exists(oe : AssociationEnd | oe.composition = true))" +
-                    "->asOrderedSet()" +
-                    "->first()" +
-                    ".classifier" +
-                    "->select(c : Classifier | c.oclIsKindOf(Class))" +
-                    "->collect(c : Classifier | c.oclAsType(Class))" +
-                    "->asOrderedSet()" +
-                    "->first()" +
-                    ".getOuterMostContainer()"
-                        , new Object[0]);
+                "if self.oclIsTypeOf(Association) then "
+                + "self.associationEnds"
+                + "->select(ae : AssociationEnd | ae.composition = true)"
+                + "->asOrderedSet()"
+                + "->first()"
+                + ".classifier"
+                + "->select(c : Classifier | c.oclIsKindOf(Class))"
+                + "->collect(c : Classifier | c.oclAsType(Class))"
+                + "->asOrderedSet()"
+                + "->first()"
+                + ".getOuterMostContainer() "
+                + "else self.oclAsType(AssociationClass).getOuterMostContainerFromAssociationClass() endif", new Object[0]);
 
         result &= this.ieos.insertOperation("AssociationClass", "getOuterMostContainerFromAssociationClass", "Class",
-                "if " +
-                    "self.associationEnds->size() = 1 " +
-                "then " +
-                    "self.associationEnds" +
-                        "->asOrderedSet()" +
-                        "->first()" +
-                        ".class" +
-                        ".getOuterMostContainer()" +
-                        "->asOrderedSet()" +
-                        "->first() " +
-                "else " +
-                    "self " +
-                "endif", new Object[0]);
+                "if "
+                + "self.associationEnds->size() = 1 "
+                + "then "
+                + "self.associationEnds"
+                + "->asOrderedSet()"
+                + "->first()"
+                + ".class"
+                + ".getOuterMostContainer()"
+                + "->asOrderedSet()"
+                + "->first() "
+                + "else "
+                + "self "
+                + "endif", new Object[0]);
+
+        result &= this.ieos.insertOperation("Class", "isOuterMostContainer", "Boolean",
+                "self = self.getOuterMostContainer()", new Object[0]);
+
+        result &= this.ieos.insertOperation("Class", "getAllOuterMostContainer", "Set(Class)",
+                "Class.allInstances()->select(c : Class | c.isOuterMostContainer())->asSet()", new Object[0]);
+
+
 
         if (!result) {
             throw new Exception("It was not possible to insert all the operations in the UML model");
@@ -159,9 +220,7 @@ public class DominioUml extends Dominio {
     }
 
     @Override
-    protected void insertMetamodelStructure() throws Exception {
-        logger.debug("Inserting Uml MetaModel Structure");
-
+    public void insertMetamodelClasses() throws Exception {
         this.ieos.insertClass("ModelElement");
         this.ieos.insertClass("Classifier");
         this.ieos.insertClass("Typed");
@@ -191,16 +250,21 @@ public class DominioUml extends Dominio {
         this.ieos.insertGeneralization("Attribute", "Feature");
         this.ieos.insertGeneralization("Operation", "Feature");
         this.ieos.insertGeneralization("Parameter", "Typed");
+    }
 
-        // Pesquisar com calma o erro das ordens!
-        this.ieos.insertAssociation("AssociationEnd", "otherEnd", "1..*", "1..*", "others", "AssociationEnd");
+    @Override
+    public void insertMetamodelAssociations() throws Exception {
+        this.ieos.insertAssociation("AssociationEnd", "otherEnd", "0..1", "0..*", "others", "AssociationEnd");
         this.ieos.insertAssociation("AssociationEnd", "associationEnds", "1..*", "1", "association", "Association");
         this.ieos.insertAssociation("Operation", "operation", "1", "*", "parameter", "Parameter");
         this.ieos.insertAssociation("Class", "class", "0..1", "*", "feature", "Feature");
         this.ieos.insertAssociation("Class", "classes", "*", "*", "implementedInterfaces", "Interface");
         this.ieos.insertAssociation("Classifier", "classifier", "0..1", "*", "types", "Typed");
         this.ieos.insertAssociation("Conjunto", "setA", "0..*", "1", "elementType", "Classifier");
+    }
 
+    @Override
+    public void insertMetamodelAttributes() throws Exception {
         this.ieos.insertAttribute("ModelElement", "name", "String");
         this.ieos.insertAttribute("Feature", "visibility", "String"); // ### Tipo VisibilityKind
         this.ieos.insertAttribute("AssociationEnd", "lower", "String"); // ### Tipo Lowerbound
@@ -223,197 +287,153 @@ public class DominioUml extends Dominio {
 
     }
 
-    public boolean insertClass(String id, String name) {
+    public boolean insertClass(String id, String name) throws Exception {
         if (this.ieos.getActualState() != 3) {
             logger.error("Error when insert a class: the UML diagram must be created");
             return false;
         }
-        try {
-            // Criando o objeto
-            this.ieos.insertObject("Class", id);
-            // Colocando o nome (Classifier) do objeto no campo 'name'
-            this.ieos.insertValue("Class", "name", id, name == null ? "" : name);
-        } catch (Exception e) {
-            logger.error("Error when insert a class: " + e.getMessage());
-            return false;
-        }
+
+        // Criando o objeto
+        this.ieos.insertObject("Class", id);
+        // Colocando o nome (Classifier) do objeto no campo 'name'
+        this.ieos.insertValue("Class", "name", id, name == null ? "" : name);
         return true;
     }
 
-    public boolean insertAssociationClass(String id, String name, String... ends) {
+    public boolean insertAssociationClass(String id, String name, String... ends) throws Exception {
         if (this.ieos.getActualState() != 3) {
             logger.error("Error when insert an association class: the UML diagram must be created");
             return false;
         }
-        try {
-            // Criando o objeto
-            this.ieos.insertObject("AssociationClass", id);
-            // Colocando o nome (Classifier) do objeto no campo 'name'
-            this.ieos.insertValue("AssociationClass", "name", id, name == null ? "" : name);
+        // Criando o objeto
+        this.ieos.insertObject("AssociationClass", id);
+        // Colocando o nome (Classifier) do objeto no campo 'name'
+        this.ieos.insertValue("AssociationClass", "name", id, name == null ? "" : name);
 
-            for (String end : ends) {
-                this.ieos.insertLink("AssociationEnd", end, "associationEnds", "association", id, "AssociationClass");
-            }
-        } catch (Exception e) {
-            logger.error("Error when insert an association class: " + e.getMessage());
-            return false;
+        for (String end : ends) {
+            this.ieos.insertLink("AssociationEnd", end, "associationEnds", "association", id, "AssociationClass");
         }
         return true;
     }
 
-    public boolean insertSet(String id, String name, String elementType) {
+    public boolean insertSet(String id, String name, String elementType) throws Exception {
         if (this.ieos.getActualState() != 3) {
             logger.error("Error when insert a set: the UML diagram must be created");
             return false;
         }
-        try {
-            // Criando o objeto
-            this.ieos.insertObject("Conjunto", id);
-            // Colocando o nome (Classifier) do objeto no campo 'name'
-            this.ieos.insertValue("Conjunto", "name", id, name == null ? "" : name);
-            // Colocando o link com o Classifier correto
-            this.ieos.insertLink("Conjunto", id, "setA", "elementType", elementType, "Classifier");
-        } catch (Exception e) {
-            logger.error("Error when insert an association class: " + e.getMessage());
-            return false;
-        }
+        // Criando o objeto
+        this.ieos.insertObject("Conjunto", id);
+        // Colocando o nome (Classifier) do objeto no campo 'name'
+        this.ieos.insertValue("Conjunto", "name", id, name == null ? "" : name);
+        // Colocando o link com o Classifier correto
+        this.ieos.insertLink("Conjunto", id, "setA", "elementType", elementType, "Classifier");
         return true;
     }
 
-    public boolean insertAttribute(String id, String name, String visibility, String type, String classId) {
+    public boolean insertAttribute(String id, String name, String visibility, String type, String classId) throws Exception {
         if (this.ieos.getActualState() != 3) {
             logger.error("Error when insert an attribute: the UML diagram must be created");
             return false;
         }
-        try {
-            // Criando o objeto
-            this.ieos.insertObject("Attribute", id);
-            // Colocando o nome (Typed) do objeto no campo 'name'
-            this.ieos.insertValue("Attribute", "name", id, name == null ? "" : name);
-            // Colocando a visibilidade (Feature) do objeto no campo 'visibility'
-            this.ieos.insertValue("Attribute", "visibility", id, visibility == null ? "" : visibility);
+        // Criando o objeto
+        this.ieos.insertObject("Attribute", id);
+        // Colocando o nome (Typed) do objeto no campo 'name'
+        this.ieos.insertValue("Attribute", "name", id, name == null ? "" : name);
+        // Colocando a visibilidade (Feature) do objeto no campo 'visibility'
+        this.ieos.insertValue("Attribute", "visibility", id, visibility == null ? "" : visibility);
 
-            this.ieos.insertLink("Attribute", id, "types", "classifier", type, "Classifier");
-            this.ieos.insertLink("Attribute", id, "feature", "class", classId, "Class");
+        this.ieos.insertLink("Attribute", id, "types", "classifier", type, "Classifier");
+        this.ieos.insertLink("Attribute", id, "feature", "class", classId, "Class");
 
-        } catch (Exception e) {
-            logger.error("Error when insert an operation: " + e.getMessage());
-            return false;
-        }
         return true;
     }
 
-    public boolean insertOperation(String id, String name, String visibility, String returnType, String classId) {
+    public boolean insertOperation(String id, String name, String visibility, String returnType, String classId) throws Exception {
         if (this.ieos.getActualState() != 3) {
             logger.error("Error when insert an operation: the UML diagram must be created");
             return false;
         }
-        try {
-            // Criando o objeto
-            this.ieos.insertObject("Operation", id);
-            // Colocando o nome (Typed) do objeto no campo 'name'
-            this.ieos.insertValue("Operation", "name", id, name == null ? "" : name);
-            // Colocando a visibilidade (Feature) do objeto no campo 'visibility'
-            this.ieos.insertValue("Operation", "visibility", id, visibility == null ? "" : visibility);
+        // Criando o objeto
+        this.ieos.insertObject("Operation", id);
+        // Colocando o nome (Typed) do objeto no campo 'name'
+        this.ieos.insertValue("Operation", "name", id, name == null ? "" : name);
+        // Colocando a visibilidade (Feature) do objeto no campo 'visibility'
+        this.ieos.insertValue("Operation", "visibility", id, visibility == null ? "" : visibility);
 
-            this.ieos.insertLink("Operation", id, "types", "classifier", returnType, "Classifier");
-            this.ieos.insertLink("Operation", id, "feature", "class", classId, "Class");
+        this.ieos.insertLink("Operation", id, "types", "classifier", returnType, "Classifier");
+        this.ieos.insertLink("Operation", id, "feature", "class", classId, "Class");
 
-        } catch (Exception e) {
-            logger.error("Error when insert an operation: " + e.getMessage());
-            return false;
-        }
         return true;
     }
 
-    public boolean insertParameter(String id, String name, String type, String operationId) {
+    public boolean insertParameter(String id, String name, String type, String operationId) throws Exception {
         if (this.ieos.getActualState() != 3) {
             logger.error("Error when insert a parameter: the UML diagram must be created");
             return false;
         }
-        try {
-            // Criando o objeto
-            this.ieos.insertObject("Parameter", id);
-            // Colocando o nome (Typed) do objeto no campo 'name'
-            this.ieos.insertValue("Parameter", "name", id, name == null ? "" : name);
+        // Criando o objeto
+        this.ieos.insertObject("Parameter", id);
+        // Colocando o nome (Typed) do objeto no campo 'name'
+        this.ieos.insertValue("Parameter", "name", id, name == null ? "" : name);
 
-            this.ieos.insertLink("Parameter", id, "types", "classifier", type, "Classifier");
-            this.ieos.insertLink("Parameter", id, "parameter", "operation", operationId, "Operation");
+        this.ieos.insertLink("Parameter", id, "types", "classifier", type, "Classifier");
+        this.ieos.insertLink("Parameter", id, "parameter", "operation", operationId, "Operation");
 
-        } catch (Exception e) {
-            logger.error("Error when insert a parameter: " + e.getMessage());
-            return false;
-        }
         return true;
     }
 
-    public boolean insertAssociationEnd(String id, String name, String visibility, String type, String lower, String upper, Boolean composition, String classId) {
+    public boolean insertAssociationEnd(String id, String name, String visibility, String type, String lower, String upper, Boolean composition, String classId) throws Exception {
         if (this.ieos.getActualState() != 3) {
             logger.error("Error when insert an associationEnd: the UML diagram must be created");
             return false;
         }
-        try {
-            // Criando o objeto
-            this.ieos.insertObject("AssociationEnd", id);
-            // Colocando o nome (Typed) do objeto no campo 'name'
-            this.ieos.insertValue("AssociationEnd", "name", id, name == null ? "" : name);
+        // Criando o objeto
+        this.ieos.insertObject("AssociationEnd", id);
+        // Colocando o nome (Typed) do objeto no campo 'name'
+        this.ieos.insertValue("AssociationEnd", "name", id, name == null ? "" : name);
 
-            this.ieos.insertLink("AssociationEnd", id, "types", "classifier", type, "Classifier");
+        // Colocando a visibilidade (Feature) do objeto no campo 'visibility'
+        this.ieos.insertValue("AssociationEnd", "visibility", id, visibility == null ? "" : visibility);
+        // Colocando o campo 'lower' do objeto
+        this.ieos.insertValue("AssociationEnd", "lower", id, lower == null ? "" : lower);
+        // Colocando o campo 'upper' do objeto
+        this.ieos.insertValue("AssociationEnd", "upper", id, upper == null ? "" : upper);
+        // Colocando o campo 'composition' do objeto
+        this.ieos.insertValue("AssociationEnd", "composition", id, composition == true ? "true" : "false");
 
-            // Colocando a visibilidade (Feature) do objeto no campo 'visibility'
-            this.ieos.insertValue("AssociationEnd", "visibility", id, visibility == null ? "" : visibility);
-            // Colocando o campo 'lower' do objeto
-            this.ieos.insertValue("AssociationEnd", "lower", id, lower == null ? "" : lower);
-            // Colocando o campo 'upper' do objeto
-            this.ieos.insertValue("AssociationEnd", "upper", id, upper == null ? "" : upper);
-            // Colocando o campo 'composition' do objeto
-            this.ieos.insertValue("AssociationEnd", "composition", id, composition == true ? "true" : "false");
+        this.ieos.insertLink("AssociationEnd", id, "types", "classifier", type, "Classifier");
+        this.ieos.insertLink("AssociationEnd", id, "feature", "class", classId, "Class");
 
-            this.ieos.insertLink("AssociationEnd", id, "feature", "class", classId, "Class");
-
-        } catch (Exception e) {
-            logger.error("Error when insert an associationEnd: " + e.getMessage());
-            return false;
-        }
         return true;
     }
 
-    public boolean insertAssociation(String id, String name, String... associationEndIds) {
+    public boolean insertAssociation(String id, String name, String... associationEndIds) throws Exception {
         if (this.ieos.getActualState() != 3) {
             logger.error("Error when insert an association: the UML diagram must be created");
             return false;
         }
-        try {
-            if (associationEndIds.length < 2) {
-                throw new Exception("Association can't have less than 2 AssociationEnd");
-            }
+        if (associationEndIds.length < 2) {
+            throw new Exception("Association can't have less than 2 AssociationEnd");
+        }
 
-            // Criando o objeto
-            this.ieos.insertObject("Association", id);
+        // Criando o objeto
+        this.ieos.insertObject("Association", id);
+        this.ieos.insertValue("Association", "name", id, name == null ? "" : name);
 
-            // Faz a relação entre este objeto e os fins de associação, que tem o minimo de 2
-            for (String associationEndId : associationEndIds) {
-                this.ieos.insertLink("AssociationEnd", associationEndId, "associationEnds", "association", id, "Association");
-            }
-        } catch (Exception e) {
-            logger.error("Error when insert an association: " + e.getMessage());
-            return false;
+        // Faz a relação entre este objeto e os fins de associação, que tem o minimo de 2
+        for (String associationEndId : associationEndIds) {
+            this.ieos.insertLink("AssociationEnd", associationEndId, "associationEnds", "association", id, "Association");
         }
         return true;
     }
 
-    public boolean insertLinksBetweenAssociationEnds(String associationEnd, String otherEnd) {
+    public boolean insertLinksBetweenAssociationEnds(String associationEnd, String otherEnd) throws Exception {
         if (this.ieos.getActualState() != 3) {
             logger.error("Error when insert a link between associationEnds: the UML diagram must be created");
             return false;
         }
-        try {
-            this.ieos.insertLink("AssociationEnd", associationEnd, "others", "otherEnd", otherEnd, "AssociationEnd");
-            this.ieos.insertLink("AssociationEnd", otherEnd, "others", "otherEnd", associationEnd, "AssociationEnd");
-        } catch (Exception e) {
-            logger.error("Error when insert a link between associationEnds: " + e.getMessage());
-            return false;
-        }
+        this.ieos.insertLink("AssociationEnd", associationEnd, "others", "otherEnd", otherEnd, "AssociationEnd");
+        this.ieos.insertLink("AssociationEnd", otherEnd, "others", "otherEnd", associationEnd, "AssociationEnd");
         return true;
     }
 }
