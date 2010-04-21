@@ -21,27 +21,27 @@ public abstract class Dominio {
     protected XEOS ieos;
     protected static Logger logger = LoggerFactory.getLogger(DominioUml.class);
 
-    public Dominio(XEOS ieos) {
+    public Dominio(XEOS ieos) throws Exception {
         this.invariants = new Hashtable<String, String>();
 
         this.ieos = ieos;
-        try {
-//            this.ieos.createClassDiagram();
+//        try {
+////            this.ieos.createClassDiagram();
 
             initializeMetamodel();
-        } catch (Exception e) {
-            logger.error("Error creating the metamodel: " + e.getMessage());
-            logger.error(e.toString());
-            System.exit(0);
-//        } finally {
-//            try {
-//                this.ieos.closeClassDiagram();
-//            } catch (XEOSException e) {
-//                logger.error("Error creating the metamodel: " + e.getMessage());
-//                logger.error(e.toString());
-//                System.exit(0);
-//            }
-        }
+//        } catch (Exception e) {
+//            logger.error("Error creating the metamodel: " + e.getMessage());
+//            logger.error(e.toString());
+//            System.exit(0);
+////        } finally {
+////            try {
+////                this.ieos.closeClassDiagram();
+////            } catch (XEOSException e) {
+////                logger.error("Error creating the metamodel: " + e.getMessage());
+////                logger.error(e.toString());
+////                System.exit(0);
+////            }
+//        }
 
     }
 
@@ -141,9 +141,9 @@ public abstract class Dominio {
     protected final void initializeMetamodel() throws Exception {
         logger.debug("Initializing Diagram...");
 
-        insertMetamodelStructure();
-        insertMetamodelOperations();
-        insertMetamodelInvariants();
+//        insertMetamodelStructure();
+//        insertMetamodelOperations();
+//        insertMetamodelInvariants();
     }
 
     protected final boolean insertInvariant(String invName, String invBody) {
@@ -155,11 +155,19 @@ public abstract class Dominio {
         return true;
     }
 
-    protected abstract void insertMetamodelInvariants() throws Exception;
+    public abstract void insertMetamodelInvariants() throws Exception;
 
-    protected abstract boolean insertMetamodelOperations() throws Exception;
+    public abstract boolean insertMetamodelOperations() throws Exception;
 
-    protected abstract void insertMetamodelStructure() throws Exception;
+    protected final void insertMetamodelStructure() throws Exception {
+//        insertMetamodelClasses();
+//        insertMetamodelAssociations();
+//        insertMetamodelAttributes();
+    }
+
+    public abstract void insertMetamodelClasses() throws Exception;
+    public abstract void insertMetamodelAssociations() throws Exception;
+    public abstract void insertMetamodelAttributes() throws Exception;
 
     // OK
     public final String query(String query) throws Exception {

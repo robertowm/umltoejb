@@ -27,6 +27,7 @@ public abstract class Transformador<DomOr extends Dominio, DomDest extends Domin
     }
 
     protected String[] tratarResultadoQuery(String resultado) {
+        resultado = resultado.replace("\n", "");
         int inicio = resultado.indexOf("{");
         int fim = resultado.indexOf("}");
 
