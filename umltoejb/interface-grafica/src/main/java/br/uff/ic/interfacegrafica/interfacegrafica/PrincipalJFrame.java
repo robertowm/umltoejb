@@ -15,6 +15,8 @@ import core.XEOS;
 import core.exception.XEOSException;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
@@ -44,7 +46,7 @@ public class PrincipalJFrame extends javax.swing.JFrame {
         aEjb.insertEJBEntityComponent("Comestible_EC_ID", "Comestible");
 
         aEjb.insertEJBAssociationEnd("standardBreakfast_AE_ID", "standardBreakfast", "1", "1", true, "StandardBreakfast_DC_ID", "StandardBreakfast_DC_ID");
-        aEjb.insertEJBAssociationEnd("part_AE_ID","part", "0", "*", false, "Part_DC_ID", "Part_DC_ID");
+        aEjb.insertEJBAssociationEnd("part_AE_ID", "part", "0", "*", false, "Part_DC_ID", "Part_DC_ID");
         aEjb.insertEJBDataAssociation("standardBreakfastPart_DA_ID", "standardBreakfastPart", "standardBreakfast_DS_ID", "standardBreakfast_AE_ID", "part_AE_ID");
 
         aEjb.insertEJBAssociationEnd("comestibleKey_AE_ID", "comestibleKey", "1", "1", false, "Comestible_KC_ID", "Comestible_KC_ID");
@@ -82,21 +84,21 @@ public class PrincipalJFrame extends javax.swing.JFrame {
         aUml.insertClass("StandardBreakfast_ID", "StandardBreakfast");
         aUml.insertClass("Comestible_ID", "Comestible");
 
-        aUml.insertAttribute("accountNumberC_ID", "accountNumberC", "public", "Integer", "Customer_ID");
-        aUml.insertAttribute("addressC_ID", "addressC", "public", "String", "Customer_ID");
-        aUml.insertAttribute("deliveryAddressBO_ID", "deliveryAddressBO", "public", "String", "BreakfastOrder_ID");
-        aUml.insertAttribute("deliveryDateBO_ID", "deliveryDateBO", "public", "Date", "BreakfastOrder_ID");
-        aUml.insertAttribute("deliveryTimeBO_ID", "deliveryTimeBO", "public", "Date", "BreakfastOrder_ID");
-        aUml.insertAttribute("discountBO_ID", "discountBO", "public", "Double", "BreakfastOrder_ID");
-        aUml.insertAttribute("orderDateBO_ID", "orderDateBO", "public", "Date", "BreakfastOrder_ID");
-        aUml.insertAttribute("numberB_ID", "numberB", "public", "Integer", "Breakfast_ID");
-        aUml.insertAttribute("nameSB_ID", "nameSB", "public", "String", "StandardBreakfast_ID");
-        aUml.insertAttribute("priceSB_ID", "priceSB", "public", "Real", "StandardBreakfast_ID");
-        aUml.insertAttribute("styleSB_ID", "styleSB", "public", "String", "StandardBreakfast_ID");
-        aUml.insertAttribute("nameCo_ID", "nameCo", "public", "String", "Comestible_ID");
-        aUml.insertAttribute("minimalQuantityCo_ID", "minimalQuantityCo", "public", "Integer", "Comestible_ID");
-        aUml.insertAttribute("priceComestibleCo_ID", "priceComestibleCo", "public", "Double", "Comestible_ID");
-        aUml.insertAttribute("transportFormCo_ID", "transportFormCo", "public", "String", "Comestible_ID");
+        aUml.insertAttribute("accountNumberC_ID", "accountNumberC", "public", "UMLInteger", "Customer_ID");
+        aUml.insertAttribute("addressC_ID", "addressC", "public", "UMLString", "Customer_ID");
+        aUml.insertAttribute("deliveryAddressBO_ID", "deliveryAddressBO", "public", "UMLString", "BreakfastOrder_ID");
+        aUml.insertAttribute("deliveryDateBO_ID", "deliveryDateBO", "public", "UMLDate", "BreakfastOrder_ID");
+        aUml.insertAttribute("deliveryTimeBO_ID", "deliveryTimeBO", "public", "UMLDate", "BreakfastOrder_ID");
+        aUml.insertAttribute("discountBO_ID", "discountBO", "public", "UMLDouble", "BreakfastOrder_ID");
+        aUml.insertAttribute("orderDateBO_ID", "orderDateBO", "public", "UMLDate", "BreakfastOrder_ID");
+        aUml.insertAttribute("numberB_ID", "numberB", "public", "UMLInteger", "Breakfast_ID");
+        aUml.insertAttribute("nameSB_ID", "nameSB", "public", "UMLString", "StandardBreakfast_ID");
+        aUml.insertAttribute("priceSB_ID", "priceSB", "public", "UMLReal", "StandardBreakfast_ID");
+        aUml.insertAttribute("styleSB_ID", "styleSB", "public", "UMLString", "StandardBreakfast_ID");
+        aUml.insertAttribute("nameCo_ID", "nameCo", "public", "UMLString", "Comestible_ID");
+        aUml.insertAttribute("minimalQuantityCo_ID", "minimalQuantityCo", "public", "UMLInteger", "Comestible_ID");
+        aUml.insertAttribute("priceComestibleCo_ID", "priceComestibleCo", "public", "UMLDouble", "Comestible_ID");
+        aUml.insertAttribute("transportFormCo_ID", "transportFormCo", "public", "UMLString", "Comestible_ID");
 
         aUml.insertAssociationEnd("customerBO_ID", "customerBO", "public", "Customer_ID", "1", "1", false, "BreakfastOrder_ID");
         aUml.insertAssociationEnd("ordersC_ID", "ordersC", "public", "BreakfastOrder_ID", "1", "*", false, "Customer_ID");
@@ -113,61 +115,82 @@ public class PrincipalJFrame extends javax.swing.JFrame {
         aUml.insertLinksBetweenAssociationEnds("breakfastsSB_ID", "standardB_ID");
         aUml.insertAssociation("Breakfast_StandardBreakfast_ID", "Breakfast_StandardBreakfast", "breakfastsSB_ID", "standardB_ID");
 
-        aUml.insertAssociationEnd("standardsC_ID", "standardsC", "public", "StandardBreakfast_ID", "0", "*", false, "Comestible_ID");
+//        aUml.insertAssociationEnd("standardsC_ID", "standardsC", "public", "StandardBreakfast_ID", "0", "*", false, "Comestible_ID");
         aUml.insertAssociationEnd("comestibleSB_ID", "comestibleSB", "public", "Comestible_ID", "1", "*", false, "StandardBreakfast_ID");
-        aUml.insertLinksBetweenAssociationEnds("standardsC_ID", "comestibleSB_ID");
-        aUml.insertAssociationClass("PartClass_ID", "PartClass", "standardsC_ID", "comestibleSB_ID");
-        aUml.insertAttribute("quantityPC_ID", "quantityPC", "public", "Integer", "PartClass_ID");
+//        aUml.insertLinksBetweenAssociationEnds("standardsC_ID", "comestibleSB_ID");
+//        aUml.insertAssociationClass("PartClass_ID", "PartClass", "standardsC_ID", "comestibleSB_ID");
+        aUml.insertAssociationClass("PartClass_ID", "PartClass", "comestibleSB_ID");
+        aUml.insertAttribute("quantityPC_ID", "quantityPC", "public", "UMLInteger", "PartClass_ID");
 
-        aUml.insertAssociationEnd("breakfastsC_ID", "breakfastsC", "public", "Breakfast_ID", "0", "*", false, "Comestible_ID");
+//        aUml.insertAssociationEnd("breakfastsC_ID", "breakfastsC", "public", "Breakfast_ID", "0", "*", false, "Comestible_ID");
         aUml.insertAssociationEnd("comestibleItemB_ID", "comestibleItemB", "public", "Comestible_ID", "0", "*", false, "Breakfast_ID");
-        aUml.insertLinksBetweenAssociationEnds("breakfastsC_ID", "comestibleItemB_ID");
-        aUml.insertAssociationClass("ChangeClass_ID", "ChangeClass", "breakfastsC_ID", "comestibleItemB_ID");
-        aUml.insertAttribute("quantityCC_ID", "quantityCC", "public", "Integer", "ChangeClass_ID");
+//        aUml.insertLinksBetweenAssociationEnds("breakfastsC_ID", "comestibleItemB_ID");
+//        aUml.insertAssociationClass("ChangeClass_ID", "ChangeClass", "breakfastsC_ID", "comestibleItemB_ID");
+        aUml.insertAssociationClass("ChangeClass_ID", "ChangeClass", "comestibleItemB_ID");
+        aUml.insertAttribute("quantityCC_ID", "quantityCC", "public", "UMLInteger", "ChangeClass_ID");
 
-        aUml.insertOperation("createOrder_ID", "createOrder", "public", "Boolean", "Customer_ID");
-        aUml.insertOperation("calculatePrice_ID", "calculatePrice", "public", "Double", "BreakfastOrder_ID");
+        aUml.insertOperation("createOrder_ID", "createOrder", "public", "UMLBoolean", "Customer_ID");
+        aUml.insertOperation("calculatePrice_ID", "calculatePrice", "public", "UMLDouble", "BreakfastOrder_ID");
     }
 
     /** Creates new form PrincipalJFrame */
-    public PrincipalJFrame() {
+    public PrincipalJFrame() throws Exception {
         initComponents();
 
         xeos = new XEOS();
         DominioUmlEjb aJuncao = null;
-        try {
-            xeos.createClassDiagram();
 
-            aUml = new DominioUml(xeos);
-            aEjb = new DominioEjb(xeos);
-            aJuncao = new DominioUmlEjb(xeos);
+//        try {
+        xeos.createClassDiagram();
 
-            xeos.closeClassDiagram();
-        } catch (XEOSException ex) {
-            ex.printStackTrace();
-            System.exit(0);
-        }
+        aUml = new DominioUml(xeos);
+        aEjb = new DominioEjb(xeos);
+        aJuncao = new DominioUmlEjb(xeos);
 
-        try {
-            xeos.createObjectDiagram();
+        aUml.insertMetamodelClasses();
+        aEjb.insertMetamodelClasses();
+        aJuncao.insertMetamodelClasses();
 
-            aUml.createSpecificationOfCurrentDiagram();
-            aEjb.createSpecificationOfCurrentDiagram();
-            aJuncao.createSpecificationOfCurrentDiagram();
+        aUml.insertMetamodelAttributes();
+        aEjb.insertMetamodelAttributes();
+        aJuncao.insertMetamodelAttributes();
 
-            criarDiagramaObjetosUml();
+        aUml.insertMetamodelAssociations();
+        aEjb.insertMetamodelAssociations();
+        aJuncao.insertMetamodelAssociations();
+
+        aUml.insertMetamodelOperations();
+        aEjb.insertMetamodelOperations();
+        aJuncao.insertMetamodelOperations();
+
+        aUml.insertMetamodelInvariants();
+        aEjb.insertMetamodelInvariants();
+        aJuncao.insertMetamodelInvariants();
+
+        xeos.closeClassDiagram();
+//        } catch (XEOSException ex) {
+//            ex.printStackTrace();
+//            System.exit(0);
+//        }
+
+//        try {
+        xeos.createObjectDiagram();
+
+        aUml.createSpecificationOfCurrentDiagram();
+        aEjb.createSpecificationOfCurrentDiagram();
+        aJuncao.createSpecificationOfCurrentDiagram();
+
+        criarDiagramaObjetosUml();
 //            criarDiagramaObjetosEjb();
 
-//            ContratoTransformacao ct = new ContratoTransformacao
-//                    <DominioUml, DominioEjb, DominioUmlEjb, TransformadorUmlEjb, GeradorCodigoEjb>
-//                    (aUml, aEjb, aJuncao, new TransformadorUmlEjb(aUml, aEjb, aJuncao), new GeradorCodigoEjb(aEjb,""));
-//            ct.transformar();
+        ContratoTransformacao ct = new ContratoTransformacao<DominioUml, DominioEjb, DominioUmlEjb, TransformadorUmlEjb, GeradorCodigoEjb>(aUml, aEjb, aJuncao, new TransformadorUmlEjb(aUml, aEjb, aJuncao), new GeradorCodigoEjb(aEjb, ""));
+        ct.transformar();
 
-            xeos.closeObjectDiagram();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.exit(0);
-        }
+        xeos.closeObjectDiagram();
+//        } catch (Exception ex) {
+//            ex.printStackTrace();
+//            System.exit(0);
+//        }
 
 
 
@@ -354,7 +377,12 @@ public class PrincipalJFrame extends javax.swing.JFrame {
 
             @Override
             public void run() {
-                new PrincipalJFrame().setVisible(true);
+                try {
+                    new PrincipalJFrame().setVisible(true);
+                } catch (Exception ex) {
+                    System.out.println(ex.getMessage());
+                    Logger.getLogger(PrincipalJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
     }
