@@ -24,6 +24,10 @@ public abstract class GeradorCodigo<T extends Dominio> {
         return s.replaceFirst(s.substring(0,1), s.substring(0,1).toLowerCase());
     }
 
+    protected String upperFirstLetter(String s) {
+        return s.replaceFirst(s.substring(0,1), s.substring(0,1).toUpperCase());
+    }
+
     protected String[] tratarResultadoQuery(String resultado) {
         int inicio = resultado.indexOf("{");
         int fim = resultado.indexOf("}");

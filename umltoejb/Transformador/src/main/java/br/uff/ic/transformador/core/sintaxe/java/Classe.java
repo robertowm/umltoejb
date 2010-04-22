@@ -19,7 +19,7 @@ public class Classe implements Persistente {
     private List<Atributo> atributos;
     private List<String> caminhosImport;
     private List<Construtor> construtores;
-//    private List<Metodo> metodos;
+    private List<Metodo> metodos;
 
     protected Classe() {
     }
@@ -76,6 +76,12 @@ public class Classe implements Persistente {
         if (construtores != null) {
             for (Construtor construtor : construtores) {
                 sb.append(construtor.serialize() + "\n");
+            }
+        }
+
+        if (metodos != null) {
+            for (Metodo metodo : metodos) {
+                sb.append(metodo.serialize() + "\n\n");
             }
         }
 
@@ -174,6 +180,18 @@ public class Classe implements Persistente {
             construtores = new ArrayList<Construtor>();
         }
         construtores.add(construtor);
+        return this;
+    }
+
+    public List<Metodo> getMetodos() {
+        return this.metodos;
+    }
+
+    public Classe addMetodo(Metodo metodo) {
+        if (metodos == null) {
+            metodos = new ArrayList<Metodo>();
+        }
+        metodos.add(metodo);
         return this;
     }
 }

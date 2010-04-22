@@ -304,7 +304,9 @@ public class TransformadorUmlEjb extends Transformador<DominioUml, DominioEjb, D
         destino.insertEJBDataClassSchemaLink(idEjbDataClass, idEjbDataSchema);
 
         // class.getAllContained(Set(UML::Class){}).operations() <~> entityComponent.feature
-        String[] idsUmlOperations = tratarResultadoQuery(origem.query(idUmlClass + ".getAllContained().feature->select(f : Feature | f.oclIsKindOf(Operation))"));
+        // Apesar da query estar correta e otimizada, o xeos nao retorna os resultados corretos quando recupera as features e no conjunto de classes possui uma AssociationClass
+//        String[] idsUmlOperations = tratarResultadoQuery(origem.query(idUmlClass + ".getAllContained().feature->select(f : Feature | f.oclIsKindOf(Operation))"));
+        String[] idsUmlOperations = tratarResultadoQuery(origem.query("Operation.allInstances()->select(op : Operation | op.class->notEmpty())->select(op : Operation | " + idUmlClass + ".getAllContained()->includes(op.class->asOrderedSet()->first().oclAsType(Class)))"));
         if (idsUmlOperations != null && idsUmlOperations.length > 0 && !"".equals(idsUmlOperations[0])) {
             for (String idOperation : idsUmlOperations) {
                 String idBusinessMethod = tratarResultadoQuery(juncao.query(idOperation + ".transformerToBusinessMethod.businessMethod"))[0];
