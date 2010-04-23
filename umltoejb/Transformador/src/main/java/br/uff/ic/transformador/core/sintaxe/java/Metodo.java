@@ -9,10 +9,11 @@ import java.util.List;
  */
 public class Metodo implements NaoPersistente {
 
-    private String visibilidade;
-    private boolean estatico;
-    private boolean overridable;
-    private String retorno;
+    private String visibilidade = "public";
+    private boolean estatico = false;
+    private boolean overridable = true;
+    private boolean abstrato = false;
+    private String retorno = "void";
     private String nome;
     private List<Parametro> parametros;
     private List<String> excecoes;
@@ -36,7 +37,7 @@ public class Metodo implements NaoPersistente {
         return this;
     }
 
-    public boolean getEstatico() {
+    public boolean isEstatico() {
         return estatico;
     }
 
@@ -45,12 +46,21 @@ public class Metodo implements NaoPersistente {
         return this;
     }
 
-    public boolean getOverridable() {
+    public boolean isOverridable() {
         return overridable;
     }
 
     public Metodo setOverridable(boolean overridable) {
         this.overridable = overridable;
+        return this;
+    }
+
+    public boolean isAbstrato() {
+        return abstrato;
+    }
+
+    public Metodo setAbstrato(boolean abstrato) {
+        this.abstrato = abstrato;
         return this;
     }
 
@@ -77,7 +87,7 @@ public class Metodo implements NaoPersistente {
     }
 
     protected String lowerFirstLetter(String s) {
-        return s.replaceFirst(s.substring(0,1), s.substring(0,1).toLowerCase());
+        return s.replaceFirst(s.substring(0, 1), s.substring(0, 1).toLowerCase());
     }
 
     public List<Parametro> getParametros() {
@@ -129,10 +139,13 @@ public class Metodo implements NaoPersistente {
             sb.append(visibilidade + " ");
         }
         if (estatico) {
-
+            sb.append("static ");
         }
         if (!overridable) {
-
+            sb.append("final ");
+        }
+        if (abstrato) {
+            sb.append("abstract ");
         }
 
         sb.append(retorno + " " + nome);
@@ -146,7 +159,7 @@ public class Metodo implements NaoPersistente {
         }
         sb.append(")");
 
-        if(excecoes != null && !excecoes.isEmpty()) {
+        if (excecoes != null && !excecoes.isEmpty()) {
             sb.append(" throws ");
             for (int i = 0; i < excecoes.size() - 1; i++) {
                 sb.append(excecoes.get(i) + ", ");
@@ -154,14 +167,16 @@ public class Metodo implements NaoPersistente {
             sb.append(excecoes.get(excecoes.size() - 1));
         }
 
-        if (codigo != null && codigo.length > 0) {
+        if (abstrato) {
+            sb.append(";\n");
+        } else {
             sb.append(" {\n");
-            for (int i = 0; i < codigo.length; i++) {
-                sb.append("\t\t" + codigo[i] + "\n");
+            if (codigo != null) {
+                for (int i = 0; i < codigo.length; i++) {
+                    sb.append("\t\t" + codigo[i] + "\n");
+                }
             }
             sb.append("\t}");
-        } else {
-            sb.append(";");
         }
         return sb;
     }

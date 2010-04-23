@@ -52,22 +52,43 @@ public abstract class Dominio {
         try {
             result = this.checkInvariants();
 
-            logger.info("===========================================");
-            logger.info("Check all invariants results:");
+            System.out.println("===========================================");
+            System.out.println("Check all invariants results:");
             if (result) {
-                logger.info("All invariants passed");
+                System.out.println("All invariants passed");
             } else {
-                logger.error("Some invariants has failed.");
+                System.out.println("Some invariants has failed.");
             }
             logger.info("===========================================");
         } catch (Exception e) {
-            logger.error("===========================================");
-            logger.error("Check invariants");
-            logger.error("Exception message: " + e.getMessage());
-            logger.error("===========================================");
+            System.out.println("===========================================");
+            System.out.println("Check invariants");
+            System.out.println("Exception message: " + e.getMessage());
+            System.out.println("===========================================");
             return false;
         }
         return result;
+//        boolean result = true;
+//
+//        try {
+//            result = this.checkInvariants();
+//
+//            logger.info("===========================================");
+//            logger.info("Check all invariants results:");
+//            if (result) {
+//                logger.info("All invariants passed");
+//            } else {
+//                logger.error("Some invariants has failed.");
+//            }
+//            logger.info("===========================================");
+//        } catch (Exception e) {
+//            logger.error("===========================================");
+//            logger.error("Check invariants");
+//            logger.error("Exception message: " + e.getMessage());
+//            logger.error("===========================================");
+//            return false;
+//        }
+//        return result;
     }
 
     // OK
@@ -107,23 +128,40 @@ public abstract class Dominio {
             }
         }
 
-        logger.info("===========================================");
-        logger.info("Check invariants");
-        logger.info(msgResult);
-        logger.info("===========================================");
+        System.out.println("===========================================");
+        System.out.println("Check invariants");
+        System.out.println(msgResult);
+        System.out.println("===========================================");
 
-        logger.info("===========================================");
-        logger.info("Check invariants results");
+        System.out.println("===========================================");
+        System.out.println("Check invariants results");
         if (result) {
-            logger.info("All invariants passed");
+            System.out.println("All invariants passed");
         } else {
-            logger.error("Some invariants has failed.");
-            logger.info("The following invariants failed:");
+            System.out.println("Some invariants has failed.");
+            System.out.println("The following invariants failed:");
             for (String failedInv : failedInvs) {
-                logger.info(failedInv + " " + (String) invariants.get(failedInv));
+                System.out.println(failedInv + " " + (String) invariants.get(failedInv));
             }
         }
-        logger.info("===========================================");
+        System.out.println("===========================================");
+//        logger.info("===========================================");
+//        logger.info("Check invariants");
+//        logger.info(msgResult);
+//        logger.info("===========================================");
+//
+//        logger.info("===========================================");
+//        logger.info("Check invariants results");
+//        if (result) {
+//            logger.info("All invariants passed");
+//        } else {
+//            logger.error("Some invariants has failed.");
+//            logger.info("The following invariants failed:");
+//            for (String failedInv : failedInvs) {
+//                logger.info(failedInv + " " + (String) invariants.get(failedInv));
+//            }
+//        }
+//        logger.info("===========================================");
 
         return result;
     }

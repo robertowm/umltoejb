@@ -91,7 +91,7 @@ public class DominioEjb extends Dominio {
         this.insertInvariant("compositionEJBTypedEJBClassifier", "EJBTyped.allInstances()->collect(t : EJBTyped | t.type)->forAll(c : EJBClassifier | c <> NULL_EJBC)");
 
         // Toda EJBEntityComponent precisa ter, no minimo, um Table
-        this.insertInvariant("compositionEJBEntityComponentTable", "EJBEntityComponent.allInstances()->forAll(ec : EJBEntityComponent | ec.usedTable->size() >= 1)");
+//        this.insertInvariant("compositionEJBEntityComponentTable", "EJBEntityComponent.allInstances()->forAll(ec : EJBEntityComponent | ec.usedTable->size() >= 1)");
 
         // Toda EJBDataAssociation precisa ter dois EJBAssociationEnd
         this.insertInvariant("compositionEJBDataAssociationEJBAssociation", "EJBDataAssociation.allInstances()->forAll(da : EJBDataAssociation | da.associationEnds->size() = 2)");

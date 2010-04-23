@@ -122,17 +122,17 @@ public class GeradorCodigoEjb extends GeradorCodigo<DominioEjb> {
                 String idDataClass = this.tratarResultadoQuery(this.dominio.query(id + ".dataClass"))[0];
                 String nomeDataClass = this.dominio.query(idDataClass + ".name").replace("'", "");
                 Metodo metodoGet = SintaxeJava.getJavaMethod();
-                metodoGet.setNome("get" + nomeDataClass).setRetorno(nomeDataClass + "DataObject").setVisibilidade("public").addExcecao("RemoteException");
+                metodoGet.setNome("get" + nomeDataClass).setRetorno(nomeDataClass + "DataObject").setVisibilidade("public").addExcecao("RemoteException").setAbstrato(true);
                 interf.addMetodo(metodoGet);
 
                 Metodo metodoSet = SintaxeJava.getJavaMethod();
-                metodoSet.setNome("set" + nomeDataClass).setRetorno("void").setVisibilidade("public").addParametro(nomeDataClass + "DataObject", "update").addExcecao("NamingException").addExcecao("FinderException").addExcecao("CreateException").addExcecao("RemoteException");
+                metodoSet.setNome("set" + nomeDataClass).setRetorno("void").setVisibilidade("public").addParametro(nomeDataClass + "DataObject", "update").addExcecao("NamingException").addExcecao("FinderException").addExcecao("CreateException").addExcecao("RemoteException").setAbstrato(true);
                 interf.addMetodo(metodoSet);
 
                 String[] idsBusinessMethod = tratarResultadoQuery(this.dominio.query(id + ".entityComponent->asOrderedSet()->first().feature->select(f : EJBFeature | f.oclIsTypeOf(BusinessMethod))"));
                 for (String idBusinessMethod : idsBusinessMethod) {
                     Metodo metodo = SintaxeJava.getJavaMethod();
-                    metodo.setVisibilidade("public").setRetorno(converterTipoEjbParaJava(tratarResultadoQuery(this.dominio.query(idBusinessMethod + ".type"))[0])).setNome(this.dominio.query(idBusinessMethod + ".name").replace("'", "")).addExcecao("RemoteException");
+                    metodo.setVisibilidade("public").setRetorno(converterTipoEjbParaJava(tratarResultadoQuery(this.dominio.query(idBusinessMethod + ".type"))[0])).setNome(this.dominio.query(idBusinessMethod + ".name").replace("'", "")).addExcecao("RemoteException").setAbstrato(true);
 
                     String[] idsParametro = tratarResultadoQuery(this.dominio.query(idBusinessMethod + ".parameter"));
                     for (String idParametro : idsParametro) {
@@ -162,12 +162,22 @@ public class GeradorCodigoEjb extends GeradorCodigo<DominioEjb> {
 
 //                classe.addImport("java.rmi.*");
 //                classe.addImport("javax.naming.*");
-//                classe.addImport("javax.ejb.*");
+                classe.addImport("javax.ejb.*");
                 classe.addImport("java.util.*");
                 classe.setNome(this.dominio.query(id + ".name").replace("'", "") + "DataObject");
-                classe.setNomeClasseQueEstende("DataObject");
-                classe.addNomeClasseQueImplementa("java.io.Serializable");
+                classe.addNomeClasseQueImplementa("EntityBean");
                 classe.setVisibilidade("public");
+                classe.setAbstrata(true);
+
+                // EJB stuff
+                classe.addAtributo(SintaxeJava.getJavaAttribute().setNome("context").setTipo("EntityContext").setVisibilidade("private"));
+                classe.addMetodo(SintaxeJava.getJavaMethod().setNome("setEntityContext").setVisibilidade("public").setRetorno("void").setCodigo(new String[]{"this.context = context;"}).addParametro("EntityContext", "context"));
+                classe.addMetodo(SintaxeJava.getJavaMethod().setNome("unsetEntityContext").setVisibilidade("public").setRetorno("void").setCodigo(new String[]{"this.context = null;"}));
+                classe.addMetodo(SintaxeJava.getJavaMethod().setNome("ejbActivate").setVisibilidade("public").setRetorno("void"));
+                classe.addMetodo(SintaxeJava.getJavaMethod().setNome("ejbPassivate").setVisibilidade("public").setRetorno("void"));
+                classe.addMetodo(SintaxeJava.getJavaMethod().setNome("ejbRemove").setVisibilidade("public").setRetorno("void"));
+                classe.addMetodo(SintaxeJava.getJavaMethod().setNome("ejbLoad").setVisibilidade("public").setRetorno("void"));
+                classe.addMetodo(SintaxeJava.getJavaMethod().setNome("ejbStore").setVisibilidade("public").setRetorno("void"));
 
                 // Adicionando atributo 'key'
                 String idUmlClass = this.dominio.query("Class.allInstances()->select(c | c.name = " + id + ".name)->asOrderedSet()->first()");
@@ -186,6 +196,17 @@ public class GeradorCodigoEjb extends GeradorCodigo<DominioEjb> {
                 Metodo getterKey = SintaxeJava.getJavaMethod();
                 getterKey.setVisibilidade("public").setRetorno(nomeKeyClass).setNome("get" + upperFirstLetter(nomeKeyClass)).setCodigo(new String[]{"return key;"});
                 classe.addMetodo(getterKey);
+
+                // Adicionando setter para 'key'
+                Metodo setterKey = SintaxeJava.getJavaMethod();
+                setterKey.setVisibilidade("public").setRetorno("void").setNome("set" + upperFirstLetter(nomeKeyClass)).addParametro(nomeKeyClass, "key").setCodigo(new String[]{"this.key = key;"});
+                classe.addMetodo(setterKey);
+
+                // Adiciona ejbCreate
+                classe.addMetodo(SintaxeJava.getJavaMethod().setNome("ejbCreate").setVisibilidade("public").setRetorno(nomeKeyClass).addExcecao("CreateException").setCodigo(new String[]{"if (key == null) {", "\tthrow new CreateException(\"The field 'key' must not be null\");", "}","","// TODO add additional validation code, throw CreateException if data is not valid", "this.key = key;", "", "return null;"}).addParametro(nomeKeyClass, "key"));
+
+                // Adiciona ejbPostCreate (Ver se da pra automatizar)
+                classe.addMetodo(SintaxeJava.getJavaMethod().setNome("ejbPostCreate").setVisibilidade("public").setRetorno("void").setCodigo(new String[]{"// TODO populate relationships here if appropriate"}).addParametro(nomeKeyClass, "key"));
 
                 // Insere relacionamentos (AssociationEnd) com getters e setters
                 String[] idsAssocEnds = null;
@@ -212,7 +233,7 @@ public class GeradorCodigoEjb extends GeradorCodigo<DominioEjb> {
                 for (String idAssocEnd : idsAssocEnds) {
                     String nomeSimples = this.dominio.query(idAssocEnd + ".name").replace("'", "");
                     String nomeCompleto = nomeSimples + tratarResultadoQuery(this.dominio.query(idAssocEnd + ".type.name"))[0];
-                    String tipo = ("true".equals(this.dominio.query(idAssocEnd + ".type.oclIsTypeOf(EJBDataClass)").replace("'", "")) ? tratarResultadoQuery(this.dominio.query(idAssocEnd + ".type.name"))[0] + "DataObject" : tratarResultadoQuery(this.dominio.query(idAssocEnd + ".type.name"))[0]);
+                    String tipo = ("true".equals(this.dominio.query(idAssocEnd + ".type->exists(c : EJBClassifier | c.oclIsTypeOf(EJBDataClass))").replace("'", "")) ? tratarResultadoQuery(this.dominio.query(idAssocEnd + ".type.name"))[0] + "DataObject" : tratarResultadoQuery(this.dominio.query(idAssocEnd + ".type.name"))[0]);
                     String tipoLista = "List<" + tipo + ">";
                     Atributo atrib = SintaxeJava.getJavaAttribute().setVisibilidade("private").setTipo(tipoLista).setNome(nomeCompleto);
                     classe.addAtributo(atrib);
