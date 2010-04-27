@@ -5,12 +5,12 @@
  */
 package br.uff.ic.interfacegrafica.interfacegrafica;
 
-import br.uff.ic.mda.transformador.ContratoTransformacao;
-import br.uff.ic.mda.transformador.DominioEjb;
-import br.uff.ic.mda.transformador.DominioUml;
-import br.uff.ic.mda.transformador.DominioUmlEjb;
-import br.uff.ic.mda.transformador.GeradorCodigoEjb;
-import br.uff.ic.mda.transformador.TransformadorUmlEjb;
+import br.uff.ic.mda.transformer.TransformationContract;
+import br.uff.ic.mda.transformer.EjbDomain;
+import br.uff.ic.mda.transformer.UmlDomain;
+import br.uff.ic.mda.transformer.UmlEjbDomain;
+import br.uff.ic.mda.transformer.EjbCodeGenerator;
+import br.uff.ic.mda.transformer.UmlEjbTransformer;
 import core.XEOS;
 import core.exception.XEOSException;
 import java.awt.Graphics;
@@ -26,8 +26,8 @@ import javax.swing.JPanel;
  */
 public class PrincipalJFrame extends javax.swing.JFrame {
 
-    private DominioUml aUml;
-    private DominioEjb aEjb;
+    private UmlDomain aUml;
+    private EjbDomain aEjb;
     private XEOS xeos;
 
     private void criarDiagramaObjetosEjb() throws Exception {
@@ -195,14 +195,14 @@ public class PrincipalJFrame extends javax.swing.JFrame {
         initComponents();
 
         xeos = new XEOS();
-        DominioUmlEjb aJuncao = null;
+        UmlEjbDomain aJuncao = null;
 
 //        try {
         xeos.createClassDiagram();
 
-        aUml = new DominioUml(xeos);
-        aEjb = new DominioEjb(xeos);
-        aJuncao = new DominioUmlEjb(xeos);
+        aUml = new UmlDomain(xeos);
+        aEjb = new EjbDomain(xeos);
+        aJuncao = new UmlEjbDomain(xeos);
 
         aUml.insertMetamodelClasses();
         aEjb.insertMetamodelClasses();
@@ -242,8 +242,8 @@ public class PrincipalJFrame extends javax.swing.JFrame {
 //        criarDiagramaUmlTesteHeranca();
 //            criarDiagramaObjetosEjb();
 
-        ContratoTransformacao ct = new ContratoTransformacao<DominioUml, DominioEjb, DominioUmlEjb, TransformadorUmlEjb, GeradorCodigoEjb>(aUml, aEjb, aJuncao, new TransformadorUmlEjb(aUml, aEjb, aJuncao), new GeradorCodigoEjb(aEjb, ""));
-        ct.transformar();
+        TransformationContract ct = new TransformationContract(aUml, aEjb, aJuncao, new UmlEjbTransformer(aUml, aEjb, aJuncao), new EjbCodeGenerator(aEjb, ""));
+        ct.transform();
 
         xeos.closeObjectDiagram();
 //        } catch (Exception ex) {
