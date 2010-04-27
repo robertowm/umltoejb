@@ -76,13 +76,15 @@ public class DominioEjb extends Dominio {
     @Override
     public void insertMetamodelInvariants() throws Exception {
         // Todo EJBServingAttribute pertence a um EJBEntityComponent (VALIDAR)
-        this.insertInvariant("restrictionEJBServingAttributebelongstoEJBEntityComponent", "EJBServingAttribute.allInstances()->collect(sa : EJBServingAttribute | sa.class)->forAll(c : EJBClass | c.oclIsKindOf(EJBEntityComponent))");
+        this.insertInvariant("everyEJBServingAttributebelongstoEJBEntityComponent", "EJBServingAttribute.allInstances()->collect(sa : EJBServingAttribute | sa.class)->forAll(c : EJBClass | c.oclIsKindOf(EJBEntityComponent))");
 
         // Toda EJBDataSchemaElement precisa ter um EJBDataSchema
-        this.insertInvariant("compositionEJBDataSchemaElementEJBDataSchema", "EJBDataSchemaElement.allInstances()->collect(dse : EJBDataSchemaElement | dse.package)->forAll(p : EJBDataSchema | p <> NULL_EJBDS)");
+//        this.insertInvariant("compositionEJBDataSchemaElementEJBDataSchema", "EJBDataSchemaElement.allInstances()->collect(dse : EJBDataSchemaElement | dse.package)->forAll(p : EJBDataSchema | p <> NULL_EJBDS)");
+        this.insertInvariant("compositionEJBDataSchemaElementEJBDataSchema", "EJBDataSchemaElement.allInstances().package->forAll(p : EJBDataSchema | p <> NULL_EJBDS)");
 
         // Toda EJBFeature precisa ter uma EJBClass
         this.insertInvariant("compositionEJBFeatureEJBClass", "EJBFeature.allInstances()->collect(f : EJBFeature | f.class)->forAll(c : EJBClassifier | c <> NULL_EJBC)");
+//        this.insertInvariant("compositionEJBFeatureEJBClass", "EJBFeature.allInstances().class->forAll(c : EJBClassifier | c <> NULL_EJBC)");
 
         // Toda EJBParameter precisa ter um BusinessMethod
         this.insertInvariant("compositionEJBParameterBusinessMethod", "EJBParameter.allInstances()->collect(p : EJBParameter | p.operation)->forAll(o : BusinessMethod | o <> NULL_BM)");

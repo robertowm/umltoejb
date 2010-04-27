@@ -15,6 +15,17 @@ public class DominioUmlEjb extends Dominio {
     @Override
     public void insertMetamodelInvariants() throws Exception {
         logger.debug("Inserting Uml MetaModel Invariants");
+
+        // Todo DataType precisa de um correspondente EJBDataType
+        this.insertInvariant("everyDataClassMustHaveEJBDataType", "DataType.allInstances()->forAll(dt : DataType | dt.transformerToEjbDataType->notEmpty())");
+        // Toda Class e AssociationClass precisa de uma EJBKeyClass
+        this.insertInvariant("everyClassMustHaveEJBKeyClass", "Class.allInstances()->excluding(NULL_CLASS)->forAll(c : Class | c.transformerToClass->notEmpty())");
+        this.insertInvariant("everyAssociationClassMustHaveEJBKeyClass", "AssociationClass.allInstances()->forAll(ac : AssociationClass | ac.transformerToAssociationClass->notEmpty())");
+        // Toda Class e AssociationClass precisa de uma EJBDataClass
+        this.insertInvariant("everyClassMustHaveEJBDataClass", "Class.allInstances()->excluding(NULL_CLASS)->forAll(c : Class | c.transformerToEjbDataClass->notEmpty() or c.transformerToEntityComponent->notEmpty())");
+        this.insertInvariant("everyAssociationClassMustHaveEJBDataClass", "AssociationClass.allInstances()->forAll(ac : AssociationClass | ac.transformerToEjbDataClassfromAssociationClass->notEmpty())");
+        // Toda Class que eh OuterMostContainer precisa de uma EJBEntityComponent
+        this.insertInvariant("everyOuterMostClassmusthaveEJBEntityComponent", "Class.allInstances()->excluding(NULL_CLASS)->select(c : Class | c.isOuterMostContainer())->forAll(c : Class | c.transformerToEntityComponent->notEmpty())");
     }
 
     @Override
