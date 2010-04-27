@@ -133,6 +133,63 @@ public class PrincipalJFrame extends javax.swing.JFrame {
         aUml.insertOperation("calculatePrice_ID", "calculatePrice", "public", "UMLDouble", "BreakfastOrder_ID");
     }
 
+    private void criarDiagramaUmlArtigo() throws Exception {
+        aUml.insertClass("User_ID", "User");
+        aUml.insertClass("Article_ID", "Article");
+        aUml.insertClass("Comment_ID", "Comment");
+
+        aUml.insertAttribute("firstName_u_ID", "firstName", "public", "UMLString", "User_ID");
+        aUml.insertAttribute("lastName_u_ID", "lastName", "public", "UMLString", "User_ID");
+        aUml.insertAttribute("nickName_u_ID", "nickName", "public", "UMLString", "User_ID");
+        aUml.insertAttribute("login_u_ID", "login", "public", "UMLString", "User_ID");
+        aUml.insertAttribute("password_u_ID", "password", "public", "UMLString", "User_ID");
+        aUml.insertAttribute("email_u_ID", "email", "public", "UMLString", "User_ID");
+        aUml.insertAttribute("title_a_ID", "title", "public", "UMLString", "Article_ID");
+        aUml.insertAttribute("text_a_ID", "text", "public", "UMLString", "Article_ID");
+        aUml.insertAttribute("name_c_ID", "name", "public", "UMLString", "Comment_ID");
+        aUml.insertAttribute("email_c_ID", "email", "public", "UMLString", "Comment_ID");
+        aUml.insertAttribute("website_c_ID", "website", "public", "UMLString", "Comment_ID");
+        aUml.insertAttribute("text_c_ID", "text", "public", "UMLString", "Comment_ID");
+
+        aUml.insertAssociationEnd("user_ua_ID", "user", "public", "User_ID", "1", "1", false, "Article_ID");
+        aUml.insertAssociationEnd("article_ua_ID", "articles", "public", "Article_ID", "0", "*", false, "User_ID");
+        aUml.insertLinksBetweenAssociationEnds("user_ua_ID", "article_ua_ID");
+        aUml.insertAssociation("user_article_ID", "has", "user_ua_ID", "article_ua_ID");
+
+        aUml.insertAssociationEnd("article_ac_ID", "article", "public", "Article_ID", "1", "1", true, "Comment_ID");
+        aUml.insertAssociationEnd("comment_ac_ID", "comments", "public", "Comment_ID", "0", "*", false, "Article_ID");
+        aUml.insertLinksBetweenAssociationEnds("article_ac_ID", "comment_ac_ID");
+        aUml.insertAssociation("article_comment_ID", "has", "article_ac_ID", "comment_ac_ID");
+
+        aUml.insertOperation("postNewArticle_ID", "postNewArticle", "public", "UMLBoolean", "User_ID");
+    }
+
+    private void criarDiagramaUmlTesteHeranca() throws Exception {
+        aUml.insertClass("A", "A");
+        aUml.insertClass("B", "B");
+        aUml.insertClass("C", "C");
+        aUml.insertClass("D", "D");
+
+//        aUml.insertClass("T", "T");
+//        aUml.insertClass("E", "E");
+//        aUml.insertClass("F", "F");
+//        aUml.insertClass("G", "G");
+//        aUml.insertClass("H", "H");
+
+        aUml.insertClassInheritance("A", "B");
+        aUml.insertClassInheritance("B", "C");
+        aUml.insertClassInheritance("C", "D");
+        aUml.insertClassInheritance("D", "A");
+
+//        aUml.insertClassInheritance("T", "E");
+//        aUml.insertClassInheritance("T", "F");
+//        aUml.insertClassInheritance("E", "G");
+//        aUml.insertClassInheritance("F", "G");
+//        aUml.insertClassInheritance("G", "H");
+//        aUml.insertClassInheritance("H", "T");
+//        aUml.insertClassInheritance("H", "E");
+    }
+
     /** Creates new form PrincipalJFrame */
     public PrincipalJFrame() throws Exception {
         initComponents();
@@ -180,7 +237,9 @@ public class PrincipalJFrame extends javax.swing.JFrame {
         aEjb.createSpecificationOfCurrentDiagram();
         aJuncao.createSpecificationOfCurrentDiagram();
 
-        criarDiagramaObjetosUml();
+//        criarDiagramaObjetosUml();
+        criarDiagramaUmlArtigo();
+//        criarDiagramaUmlTesteHeranca();
 //            criarDiagramaObjetosEjb();
 
         ContratoTransformacao ct = new ContratoTransformacao<DominioUml, DominioEjb, DominioUmlEjb, TransformadorUmlEjb, GeradorCodigoEjb>(aUml, aEjb, aJuncao, new TransformadorUmlEjb(aUml, aEjb, aJuncao), new GeradorCodigoEjb(aEjb, ""));
@@ -195,7 +254,8 @@ public class PrincipalJFrame extends javax.swing.JFrame {
 
 
 //        System.out.println(" - Invariantes UML estao OK? " + aUml.checkAllInvariants());
-//        System.out.println(" - Invariantes EJB estão OK? " + aEjb.checkAllInvariants());
+//        System.out.println(" - Invariantes EJB estao OK? " + aEjb.checkAllInvariants());
+//        System.out.println(" - Invariantes Juncao estao OK? " + aJuncao.checkAllInvariants());
 //        System.exit(0);
 
     }
