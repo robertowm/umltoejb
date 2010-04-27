@@ -1,11 +1,11 @@
-package br.uff.ic.mda.transformador;
+package br.uff.ic.mda.transformer;
 
 import core.XEOS;
 import core.exception.XEOSException;
 
-public class DominioUml extends Dominio {
+public class UmlDomain extends Domain {
 
-    public DominioUml(XEOS ieos) throws Exception {
+    public UmlDomain(XEOS ieos) throws Exception {
         super(ieos);
     }
 
@@ -225,9 +225,9 @@ public class DominioUml extends Dominio {
 //                + " endif", new Object[]{new String[]{"rs", "Set(Class)"}});
         result &= this.ieos.insertOperation("Class", "superPlusOnSet", "Set(Class)",
                 "if self.inheritsFrom->notEmpty() and rs->excludes(self) then "
-                    + "self.inheritsFrom->collect(c : Class | c.superPlusOnSet(rs->including(self)))->flatten()->asSet()"
+                + "self.inheritsFrom->collect(c : Class | c.superPlusOnSet(rs->including(self)))->flatten()->asSet()"
                 + " else "
-                    + "rs->including(self)"
+                + "rs->including(self)"
                 + " endif", new Object[]{new String[]{"rs", "Set(Class)"}});
 
         if (!result) {
@@ -306,15 +306,14 @@ public class DominioUml extends Dominio {
 
     }
 
+    // Specific methods of this domain
+    // Class
     public boolean insertClass(String id, String name) throws Exception {
         if (this.ieos.getActualState() != 3) {
             logger.error("Error when insert a class: the UML diagram must be created");
             return false;
         }
-
-        // Criando o objeto
         this.ieos.insertObject("Class", id);
-        // Colocando o nome (Classifier) do objeto no campo 'name'
         this.ieos.insertValue("Class", "name", id, name == null ? "" : name);
         return true;
     }
@@ -325,117 +324,77 @@ public class DominioUml extends Dominio {
             return false;
         }
         this.ieos.insertLink("Class", idPai, "inheritsFrom", "inheritedBy", idFilho, "Class");
-
         return true;
     }
 
+    // AssociationClass
     public boolean insertAssociationClass(String id, String name, String... ends) throws Exception {
         if (this.ieos.getActualState() != 3) {
             logger.error("Error when insert an association class: the UML diagram must be created");
             return false;
         }
-        // Criando o objeto
         this.ieos.insertObject("AssociationClass", id);
-        // Colocando o nome (Classifier) do objeto no campo 'name'
         this.ieos.insertValue("AssociationClass", "name", id, name == null ? "" : name);
-
         for (String end : ends) {
             this.ieos.insertLink("AssociationEnd", end, "associationEnds", "association", id, "AssociationClass");
         }
         return true;
     }
 
+    // Set
     public boolean insertSet(String id, String name, String elementType) throws Exception {
         if (this.ieos.getActualState() != 3) {
             logger.error("Error when insert a set: the UML diagram must be created");
             return false;
         }
-        // Criando o objeto
         this.ieos.insertObject("Conjunto", id);
-        // Colocando o nome (Classifier) do objeto no campo 'name'
         this.ieos.insertValue("Conjunto", "name", id, name == null ? "" : name);
-        // Colocando o link com o Classifier correto
         this.ieos.insertLink("Conjunto", id, "setA", "elementType", elementType, "Classifier");
         return true;
     }
 
+    // Attribute
     public boolean insertAttribute(String id, String name, String visibility, String type, String classId) throws Exception {
         if (this.ieos.getActualState() != 3) {
             logger.error("Error when insert an attribute: the UML diagram must be created");
             return false;
         }
-        // Criando o objeto
         this.ieos.insertObject("Attribute", id);
-        // Colocando o nome (Typed) do objeto no campo 'name'
         this.ieos.insertValue("Attribute", "name", id, name == null ? "" : name);
-        // Colocando a visibilidade (Feature) do objeto no campo 'visibility'
         this.ieos.insertValue("Attribute", "visibility", id, visibility == null ? "" : visibility);
-
         this.ieos.insertLink("Attribute", id, "types", "classifier", type, "Classifier");
         this.ieos.insertLink("Attribute", id, "feature", "class", classId, "Class");
-
         return true;
     }
 
+    // Operation
     public boolean insertOperation(String id, String name, String visibility, String returnType, String classId) throws Exception {
         if (this.ieos.getActualState() != 3) {
             logger.error("Error when insert an operation: the UML diagram must be created");
             return false;
         }
-        // Criando o objeto
         this.ieos.insertObject("Operation", id);
-        // Colocando o nome (Typed) do objeto no campo 'name'
         this.ieos.insertValue("Operation", "name", id, name == null ? "" : name);
-        // Colocando a visibilidade (Feature) do objeto no campo 'visibility'
         this.ieos.insertValue("Operation", "visibility", id, visibility == null ? "" : visibility);
-
         this.ieos.insertLink("Operation", id, "types", "classifier", returnType, "Classifier");
         this.ieos.insertLink("Operation", id, "feature", "class", classId, "Class");
-
         return true;
     }
 
+    // Parameter
     public boolean insertParameter(String id, String name, String type, String operationId) throws Exception {
         if (this.ieos.getActualState() != 3) {
             logger.error("Error when insert a parameter: the UML diagram must be created");
             return false;
         }
-        // Criando o objeto
         this.ieos.insertObject("Parameter", id);
-        // Colocando o nome (Typed) do objeto no campo 'name'
         this.ieos.insertValue("Parameter", "name", id, name == null ? "" : name);
-
         this.ieos.insertLink("Parameter", id, "types", "classifier", type, "Classifier");
         this.ieos.insertLink("Parameter", id, "parameter", "operation", operationId, "Operation");
-
         return true;
     }
 
-    public boolean insertAssociationEnd(String id, String name, String visibility, String type, String lower, String upper, Boolean composition, String classId) throws Exception {
-        if (this.ieos.getActualState() != 3) {
-            logger.error("Error when insert an associationEnd: the UML diagram must be created");
-            return false;
-        }
-        // Criando o objeto
-        this.ieos.insertObject("AssociationEnd", id);
-        // Colocando o nome (Typed) do objeto no campo 'name'
-        this.ieos.insertValue("AssociationEnd", "name", id, name == null ? "" : name);
-
-        // Colocando a visibilidade (Feature) do objeto no campo 'visibility'
-        this.ieos.insertValue("AssociationEnd", "visibility", id, visibility == null ? "" : visibility);
-        // Colocando o campo 'lower' do objeto
-        this.ieos.insertValue("AssociationEnd", "lower", id, lower == null ? "" : lower);
-        // Colocando o campo 'upper' do objeto
-        this.ieos.insertValue("AssociationEnd", "upper", id, upper == null ? "" : upper);
-        // Colocando o campo 'composition' do objeto
-        this.ieos.insertValue("AssociationEnd", "composition", id, composition == true ? "true" : "false");
-
-        this.ieos.insertLink("AssociationEnd", id, "types", "classifier", type, "Classifier");
-        this.ieos.insertLink("AssociationEnd", id, "feature", "class", classId, "Class");
-
-        return true;
-    }
-
+    // Association
     public boolean insertAssociation(String id, String name, String... associationEndIds) throws Exception {
         if (this.ieos.getActualState() != 3) {
             logger.error("Error when insert an association: the UML diagram must be created");
@@ -444,18 +403,31 @@ public class DominioUml extends Dominio {
         if (associationEndIds.length < 2) {
             throw new Exception("Association can't have less than 2 AssociationEnd");
         }
-
-        // Criando o objeto
         this.ieos.insertObject("Association", id);
         this.ieos.insertValue("Association", "name", id, name == null ? "" : name);
-
-        // Faz a relação entre este objeto e os fins de associação, que tem o minimo de 2
         for (String associationEndId : associationEndIds) {
             this.ieos.insertLink("AssociationEnd", associationEndId, "associationEnds", "association", id, "Association");
         }
         return true;
     }
 
+    // AssociationEnd
+    public boolean insertAssociationEnd(String id, String name, String visibility, String type, String lower, String upper, Boolean composition, String classId) throws Exception {
+        if (this.ieos.getActualState() != 3) {
+            logger.error("Error when insert an associationEnd: the UML diagram must be created");
+            return false;
+        }
+        this.ieos.insertObject("AssociationEnd", id);
+        this.ieos.insertValue("AssociationEnd", "name", id, name == null ? "" : name);
+        this.ieos.insertValue("AssociationEnd", "visibility", id, visibility == null ? "" : visibility);
+        this.ieos.insertValue("AssociationEnd", "lower", id, lower == null ? "" : lower);
+        this.ieos.insertValue("AssociationEnd", "upper", id, upper == null ? "" : upper);
+        this.ieos.insertValue("AssociationEnd", "composition", id, composition == true ? "true" : "false");
+        this.ieos.insertLink("AssociationEnd", id, "types", "classifier", type, "Classifier");
+        this.ieos.insertLink("AssociationEnd", id, "feature", "class", classId, "Class");
+
+        return true;
+    }
     public boolean insertLinksBetweenAssociationEnds(String associationEnd, String otherEnd) throws Exception {
         if (this.ieos.getActualState() != 3) {
             logger.error("Error when insert a link between associationEnds: the UML diagram must be created");

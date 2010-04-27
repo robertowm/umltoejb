@@ -1,10 +1,10 @@
-package br.uff.ic.mda.transformador;
+package br.uff.ic.mda.transformer;
 
 import core.XEOS;
 
-public class DominioEjb extends Dominio {
+public class EjbDomain extends Domain {
 
-    public DominioEjb(XEOS ieos) throws Exception {
+    public EjbDomain(XEOS ieos) throws Exception {
         super(ieos);
     }
 
@@ -72,19 +72,16 @@ public class DominioEjb extends Dominio {
         this.ieos.insertAttribute("EJBAttribute", "visibility", "String");
     }
 
-    // FAZER
     @Override
     public void insertMetamodelInvariants() throws Exception {
         // Todo EJBServingAttribute pertence a um EJBEntityComponent (VALIDAR)
         this.insertInvariant("everyEJBServingAttributebelongstoEJBEntityComponent", "EJBServingAttribute.allInstances()->collect(sa : EJBServingAttribute | sa.class)->forAll(c : EJBClass | c.oclIsKindOf(EJBEntityComponent))");
 
         // Toda EJBDataSchemaElement precisa ter um EJBDataSchema
-//        this.insertInvariant("compositionEJBDataSchemaElementEJBDataSchema", "EJBDataSchemaElement.allInstances()->collect(dse : EJBDataSchemaElement | dse.package)->forAll(p : EJBDataSchema | p <> NULL_EJBDS)");
         this.insertInvariant("compositionEJBDataSchemaElementEJBDataSchema", "EJBDataSchemaElement.allInstances().package->forAll(p : EJBDataSchema | p <> NULL_EJBDS)");
 
         // Toda EJBFeature precisa ter uma EJBClass
         this.insertInvariant("compositionEJBFeatureEJBClass", "EJBFeature.allInstances()->collect(f : EJBFeature | f.class)->forAll(c : EJBClassifier | c <> NULL_EJBC)");
-//        this.insertInvariant("compositionEJBFeatureEJBClass", "EJBFeature.allInstances().class->forAll(c : EJBClassifier | c <> NULL_EJBC)");
 
         // Toda EJBParameter precisa ter um BusinessMethod
         this.insertInvariant("compositionEJBParameterBusinessMethod", "EJBParameter.allInstances()->collect(p : EJBParameter | p.operation)->forAll(o : BusinessMethod | o <> NULL_BM)");
@@ -110,8 +107,6 @@ public class DominioEjb extends Dominio {
         Object[] params;
         String[] param;
 
-//        result &= this.insertOperationOCL("ClasseColocadaNoSistema", "NomeDoMetodo", "R   etorno", "CodigoOCL", new Object[0]);
-
         if (!result) {
             throw new Exception("It was not possible to insert all the operations in the SecureUML model");
         }
@@ -131,8 +126,6 @@ public class DominioEjb extends Dominio {
         this.ieos.insertValue("EJBDataType", "name", "EJBInteger", "Integer");
         this.ieos.insertObject("EJBDataType", "EJBDouble");
         this.ieos.insertValue("EJBDataType", "name", "EJBDouble", "Double");
-//        this.ieos.insertObject("EJBDataType", "EJBReal");
-//        this.ieos.insertValue("EJBDataType", "name", "EJBReal", "Real");
         this.ieos.insertObject("EJBDataType", "EJBString");
         this.ieos.insertValue("EJBDataType", "name", "EJBString", "String");
         this.ieos.insertObject("EJBDataType", "EJBDate");
@@ -141,13 +134,15 @@ public class DominioEjb extends Dominio {
         this.ieos.insertValue("EJBDataType", "name", "EJBBoolean", "Boolean");
     }
 
-    // Metodos especificos do metamodelo
+    // Specific methods of this domain
+
+    // EJBDataSchema
     public boolean insertEJBDataSchema(String id, String name) throws Exception {
         return      insertEJBDataSchemaStub(id, name);
     }
     public boolean insertEJBDataSchemaStub(String id, String name) throws Exception {
         if (this.ieos.getActualState() != 3) {
-            logger.error("Error when insert an EJBDataSchema: the security diagram must be created");
+            logger.error("Error when insert an EJBDataSchema: the diagram must be created");
             return false;
         }
         this.ieos.insertObject("EJBDataSchema", id);
@@ -155,9 +150,10 @@ public class DominioEjb extends Dominio {
         return true;
     }
 
+    // EJBDataType
     public boolean insertEJBDataType(String id, String name) throws Exception {
         if (this.ieos.getActualState() != 3) {
-            logger.error("Error when insert an EJBDataType: the security diagram must be created");
+            logger.error("Error when insert an EJBDataType: the diagram must be created");
             return false;
         }
 
@@ -166,9 +162,10 @@ public class DominioEjb extends Dominio {
         return true;
     }
 
+    // EJBKeyClass
     public boolean insertEJBKeyClass(String id, String name) throws Exception {
         if (this.ieos.getActualState() != 3) {
-            logger.error("Error when insert an EJBKeyClass: the security diagram must be created");
+            logger.error("Error when insert an EJBKeyClass: the diagram must be created");
             return false;
         }
 
@@ -177,6 +174,7 @@ public class DominioEjb extends Dominio {
         return true;
     }
 
+    //EJBDataClass
     public boolean insertEJBDataClass(String id, String name, String ejbDataSchemaId) throws Exception {
         return      insertEJBDataClassStub(id, name)
                 &&  insertEJBDataClassSchemaLink(id, ejbDataSchemaId);
@@ -199,6 +197,7 @@ public class DominioEjb extends Dominio {
         return true;
     }
 
+    // EJBDataAssociation
     public boolean insertEJBDataAssociation(String id, String name, String ejbDataSchemaId, String... ejbAssociationEnds) throws Exception {
         return      insertEJBDataAssociationStub(id, name)
                 &&  insertEJBDataAssociationSchemaLink(id, ejbDataSchemaId)
@@ -206,7 +205,7 @@ public class DominioEjb extends Dominio {
     }
     public boolean insertEJBDataAssociationStub(String id, String name) throws Exception {
         if (this.ieos.getActualState() != 3) {
-            logger.error("Error when insert an EJBDataAssociation: the security diagram must be created");
+            logger.error("Error when insert an EJBDataAssociation: the diagram must be created");
             return false;
         }
         this.ieos.insertObject("EJBDataAssociation", id);
@@ -215,7 +214,7 @@ public class DominioEjb extends Dominio {
     }
     public boolean insertEJBDataAssociationSchemaLink(String id, String ejbDataSchemaId) throws Exception {
         if (this.ieos.getActualState() != 3) {
-            logger.error("Error when insert an EJBDataAssociation: the security diagram must be created");
+            logger.error("Error when insert an EJBDataAssociation: the diagram must be created");
             return false;
         }
         this.ieos.insertLink("EJBDataSchema", ejbDataSchemaId, "package", "element", id, "EJBDataAssociation");
@@ -223,7 +222,7 @@ public class DominioEjb extends Dominio {
     }
     public boolean insertEJBDataAssociationEndLinks(String id, String... ejbAssociationEnds) throws Exception {
         if (this.ieos.getActualState() != 3) {
-            logger.error("Error when insert an EJBDataAssociation: the security diagram must be created");
+            logger.error("Error when insert an EJBDataAssociation: the diagram must be created");
             return false;
         }
         for (String ejbAssociationEnd : ejbAssociationEnds) {
@@ -232,9 +231,10 @@ public class DominioEjb extends Dominio {
         return true;
     }
 
+    // EJBSessionComponent
     public boolean insertEJBSessionComponent(String id, String name) throws Exception {
         if (this.ieos.getActualState() != 3) {
-            logger.error("Error when insert an EJBSessionComponent: the security diagram must be created");
+            logger.error("Error when insert an EJBSessionComponent: the diagram must be created");
             return false;
         }
 
@@ -243,12 +243,13 @@ public class DominioEjb extends Dominio {
         return true;
     }
 
+    // EJBEntityComponent
     public boolean insertEJBEntityComponent(String id, String name) throws Exception {
         return      insertEJBEntityComponentStub(id, name);
     }
     public boolean insertEJBEntityComponentStub(String id, String name) throws Exception {
         if (this.ieos.getActualState() != 3) {
-            logger.error("Error when insert an EJBEntityComponent: the security diagram must be created");
+            logger.error("Error when insert an EJBEntityComponent: the diagram must be created");
             return false;
         }
         this.ieos.insertObject("EJBEntityComponent", id);
@@ -256,9 +257,10 @@ public class DominioEjb extends Dominio {
         return true;
     }
 
+    // Table
     public boolean insertTable(String id, String name, String ejbEntityComponentId) throws Exception {
         if (this.ieos.getActualState() != 3) {
-            logger.error("Error when insert a Table: the security diagram must be created");
+            logger.error("Error when insert a Table: the diagram must be created");
             return false;
         }
 
@@ -269,12 +271,12 @@ public class DominioEjb extends Dominio {
         return true;
     }
 
+    // BusinessMethod
     public boolean insertBusinessMethod(String id, String name, String typeId, String ejbClassId) throws Exception {
         return      insertBusinessMethodStub(id, name)
                 &&  insertBusinessMethodTypeLink(id, typeId)
                 &&  insertBusinessMethodClassLink(id, ejbClassId);
     }
-
     public boolean insertBusinessMethodStub(String id, String name) throws Exception {
         if (this.ieos.getActualState() != 3) {
             logger.error("Error when insert a BusinessMethod: the diagram must be created");
@@ -286,7 +288,6 @@ public class DominioEjb extends Dominio {
 
         return true;
     }
-
     public boolean insertBusinessMethodTypeLink(String id, String typeId) throws Exception {
         if (this.ieos.getActualState() != 3) {
             logger.error("Error when insert a BusinessMethod: the diagram must be created");
@@ -297,7 +298,6 @@ public class DominioEjb extends Dominio {
 
         return true;
     }
-
     public boolean insertBusinessMethodClassLink(String id, String ejbClassId) throws Exception {
         if (this.ieos.getActualState() != 3) {
             logger.error("Error when insert a BusinessMethod: the diagram must be created");
@@ -309,6 +309,7 @@ public class DominioEjb extends Dominio {
         return true;
     }
 
+    // EJBParameter
     public boolean insertEJBParameter(String id, String name, String typeId, String businessMethodId) throws Exception {
         return      insertEJBParameterStub(id, name)
                 &&  insertEJBParameterTypeLink(id, typeId)
@@ -340,6 +341,7 @@ public class DominioEjb extends Dominio {
         return true;
     }
 
+    // EJBAttribute
     public boolean insertEJBAttribute(String id, String name, String visibility, String typeId, String ejbClassId) throws Exception {
         return      insertEJBAttributeStub(id, name, visibility)
                 &&  insertEJBAttributeTypeLink(id, typeId)
@@ -347,7 +349,7 @@ public class DominioEjb extends Dominio {
     }
     public boolean insertEJBAttributeStub(String id, String name, String visibility) throws Exception {
         if (this.ieos.getActualState() != 3) {
-            logger.error("Error when insert an EJBAttribute: the security diagram must be created");
+            logger.error("Error when insert an EJBAttribute: the diagram must be created");
             return false;
         }
         this.ieos.insertObject("EJBAttribute", id);
@@ -357,7 +359,7 @@ public class DominioEjb extends Dominio {
     }
     public boolean insertEJBAttributeTypeLink(String id, String typeId) throws Exception {
         if (this.ieos.getActualState() != 3) {
-            logger.error("Error when insert an EJBAttribute: the security diagram must be created");
+            logger.error("Error when insert an EJBAttribute: the diagram must be created");
             return false;
         }
         this.ieos.insertLink("EJBAttribute", id, "typed", "type", typeId, "EJBClassifier");
@@ -365,13 +367,14 @@ public class DominioEjb extends Dominio {
     }
     public boolean insertEJBAttributeClassLink(String id, String ejbClassId) throws Exception {
         if (this.ieos.getActualState() != 3) {
-            logger.error("Error when insert an EJBAttribute: the security diagram must be created");
+            logger.error("Error when insert an EJBAttribute: the diagram must be created");
             return false;
         }
         this.ieos.insertLink("EJBAttribute", id, "feature", "class", ejbClassId, "EJBClass");
         return true;
     }
 
+    // EJBAssociationEnd
     public boolean insertEJBAssociationEnd(String id, String name, String lower, String upper, Boolean composition, String typeId, String ejbClassId) throws Exception {
         return      insertEJBAssociationEndStub(id, name, lower, upper, composition)
                 &&  insertEJBAssociationEndTypeLink(id, typeId)
@@ -379,7 +382,7 @@ public class DominioEjb extends Dominio {
     }
     public boolean insertEJBAssociationEndStub(String id, String name, String lower, String upper, Boolean composition) throws Exception {
         if (this.ieos.getActualState() != 3) {
-            logger.error("Error when insert an EJBAssociationEnd: the security diagram must be created");
+            logger.error("Error when insert an EJBAssociationEnd: the diagram must be created");
             return false;
         }
 
@@ -393,7 +396,7 @@ public class DominioEjb extends Dominio {
     }
     public boolean insertEJBAssociationEndTypeLink(String id, String typeId) throws Exception {
         if (this.ieos.getActualState() != 3) {
-            logger.error("Error when insert an EJBAssociationEnd: the security diagram must be created");
+            logger.error("Error when insert an EJBAssociationEnd: the diagram must be created");
             return false;
         }
 
@@ -403,7 +406,7 @@ public class DominioEjb extends Dominio {
     }
     public boolean insertEJBAssociationEndClassLink(String id, String ejbClassId) throws Exception {
         if (this.ieos.getActualState() != 3) {
-            logger.error("Error when insert an EJBAssociationEnd: the security diagram must be created");
+            logger.error("Error when insert an EJBAssociationEnd: the diagram must be created");
             return false;
         }
 
@@ -412,6 +415,7 @@ public class DominioEjb extends Dominio {
         return true;
     }
 
+    // EJBServingAttribute
     public boolean insertEJBServingAttribute(String id, String name, String lower, String upper, Boolean composition, String typeId, String ejbClassId) throws Exception {
         return      insertEJBServingAttributeStub(id, name, lower, upper, composition)
                 &&  insertEJBServingAttributeTypeLink(id, typeId)
@@ -419,7 +423,7 @@ public class DominioEjb extends Dominio {
     }
     public boolean insertEJBServingAttributeStub(String id, String name, String lower, String upper, Boolean composition) throws Exception {
         if (this.ieos.getActualState() != 3) {
-            logger.error("Error when insert an EJBServingAttribute: the security diagram must be created");
+            logger.error("Error when insert an EJBServingAttribute: the diagram must be created");
             return false;
         }
         this.ieos.insertObject("EJBServingAttribute", id);
@@ -431,7 +435,7 @@ public class DominioEjb extends Dominio {
     }
     public boolean insertEJBServingAttributeTypeLink(String id, String typeId) throws Exception {
         if (this.ieos.getActualState() != 3) {
-            logger.error("Error when insert an EJBServingAttribute: the security diagram must be created");
+            logger.error("Error when insert an EJBServingAttribute: the diagram must be created");
             return false;
         }
         this.ieos.insertLink("EJBServingAttribute", id, "typed", "type", typeId, "EJBClassifier");
@@ -439,7 +443,7 @@ public class DominioEjb extends Dominio {
     }
     public boolean insertEJBServingAttributeClassLink(String id, String ejbClassId) throws Exception {
         if (this.ieos.getActualState() != 3) {
-            logger.error("Error when insert an EJBServingAttribute: the security diagram must be created");
+            logger.error("Error when insert an EJBServingAttribute: the diagram must be created");
             return false;
         }
         this.ieos.insertLink("EJBServingAttribute", id, "feature", "class", ejbClassId, "EJBClass");

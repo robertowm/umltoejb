@@ -1,4 +1,4 @@
-package br.uff.ic.mda.transformador;
+package br.uff.ic.mda.transformer;
 
 import core.XEOS;
 import java.io.BufferedWriter;
@@ -15,40 +15,20 @@ import org.slf4j.LoggerFactory;
  *
  * @author robertowm
  */
-public abstract class Dominio {
+public abstract class Domain {
 
     protected Dictionary<String, String> invariants;
     protected XEOS ieos;
-    protected static Logger logger = LoggerFactory.getLogger(DominioUml.class);
+    protected static Logger logger = LoggerFactory.getLogger(UmlDomain.class);
 
-    public Dominio(XEOS ieos) throws Exception {
+    public Domain(XEOS ieos) throws Exception {
         this.invariants = new Hashtable<String, String>();
-
         this.ieos = ieos;
-//        try {
-////            this.ieos.createClassDiagram();
-
-            initializeMetamodel();
-//        } catch (Exception e) {
-//            logger.error("Error creating the metamodel: " + e.getMessage());
-//            logger.error(e.toString());
-//            System.exit(0);
-////        } finally {
-////            try {
-////                this.ieos.closeClassDiagram();
-////            } catch (XEOSException e) {
-////                logger.error("Error creating the metamodel: " + e.getMessage());
-////                logger.error(e.toString());
-////                System.exit(0);
-////            }
-//        }
-
+        initializeMetamodel();
     }
 
-    // OK
     public final boolean checkAllInvariants() {
         boolean result = true;
-
         try {
             result = this.checkInvariants();
 
@@ -91,7 +71,6 @@ public abstract class Dominio {
 //        return result;
     }
 
-    // OK
     protected final boolean checkInvariants() {
         boolean result = true;
         String msgResult = "\r\n";
@@ -178,7 +157,6 @@ public abstract class Dominio {
 
     protected final void initializeMetamodel() throws Exception {
         logger.debug("Initializing Diagram...");
-
 //        insertMetamodelStructure();
 //        insertMetamodelOperations();
 //        insertMetamodelInvariants();
@@ -207,7 +185,6 @@ public abstract class Dominio {
     public abstract void insertMetamodelAssociations() throws Exception;
     public abstract void insertMetamodelAttributes() throws Exception;
 
-    // OK
     public final String query(String query) throws Exception {
         return this.ieos.query(query);
     }
