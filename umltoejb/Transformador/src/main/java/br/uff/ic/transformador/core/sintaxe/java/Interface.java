@@ -10,6 +10,7 @@ import java.util.List;
  */
 public class Interface implements Persistente {
 
+    private String caminhoDiretorio;
     private String caminhoPacote;
     private String nome;
     private String visibilidade;
@@ -23,7 +24,14 @@ public class Interface implements Persistente {
 
     @Override
     public void persiste() {
-        Arquivo saida = new Arquivo(nome + ".java");
+        String caminho = "";
+        if (caminhoDiretorio != null && !"".equals(caminhoDiretorio.trim())) {
+            caminho += caminhoDiretorio;
+        }
+        if (caminhoPacote != null && !"".equals(caminhoPacote.trim())) {
+            caminho += caminhoPacote.replace(".", "/") + "/";
+        }
+        Arquivo saida = new Arquivo(caminho + nome + ".java");
 
         StringBuffer sb = new StringBuffer();
 
@@ -69,7 +77,7 @@ public class Interface implements Persistente {
 
         sb.append("\n}");
 
-        saida.append(sb.toString());
+        saida.substituteFor(sb);
     }
 
     public String getNome() {
@@ -87,6 +95,15 @@ public class Interface implements Persistente {
 
     public Interface setCaminhoPacote(String caminhoPacote) {
         this.caminhoPacote = caminhoPacote;
+        return this;
+    }
+
+    public String getCaminhoDiretorio() {
+        return this.caminhoDiretorio;
+    }
+
+    public Interface setCaminhoDiretorio(String caminhoDiretorio) {
+        this.caminhoDiretorio = caminhoDiretorio;
         return this;
     }
 

@@ -57,6 +57,10 @@ public class Arquivo{
     
     private BufferedWriter criaSaidaAppend(boolean append) {
         File file = new File(nome);
+        if (this.nome.contains("/")) {
+            File f = new File(this.nome.substring(0, this.nome.lastIndexOf("/")));
+            f.mkdirs();
+        }
         try {
             fileOut = new FileOutputStream(file, append);
             saida = new OutputStreamWriter(fileOut);
@@ -97,6 +101,18 @@ public class Arquivo{
             System.err.println("Erro no Arquivo do tipo : "+e.getMessage()+"  Classe "+ this.getClass().getName());
         }
         
+    }
+
+    public void substituteFor(StringBuffer sb){
+        try {
+            this.criaSaidaAppend(false);
+            intercalado.write(sb.toString());
+            intercalado.newLine();
+            this.fechaArqSaida();
+        } catch (IOException e) {
+            System.err.println("Erro no Arquivo do tipo : "+e.getMessage()+"  Classe "+ this.getClass().getName());
+        }
+
     }
     
     public void gravaLinha(String linha){

@@ -10,6 +10,7 @@ import java.util.List;
  */
 public class Classe implements Persistente {
 
+    private String caminhoDiretorio;
     private String caminhoPacote;
     private String nome;
     private String visibilidade;
@@ -26,7 +27,11 @@ public class Classe implements Persistente {
 
     @Override
     public void persiste() {
-        Arquivo saida = new Arquivo(nome + ".java");
+        String caminho = caminhoDiretorio;
+        if (caminhoPacote != null && !"".equals(caminhoPacote.trim())) {
+            caminho += caminhoPacote.replace(".", "/") + "/";
+        }
+        Arquivo saida = new Arquivo(caminho + nome + ".java");
 
         StringBuffer sb = new StringBuffer();
 
@@ -60,7 +65,7 @@ public class Classe implements Persistente {
             for (int i = 0; i < nomesClassesImplementa.size() - 1; i++) {
                 sb.append(nomesClassesImplementa.get(i) + ", ");
             }
-            sb.append(nomesClassesImplementa.get(nomesClassesImplementa.size()-1));
+            sb.append(nomesClassesImplementa.get(nomesClassesImplementa.size() - 1));
         }
 
         sb.append(" {\n\n");
@@ -86,8 +91,8 @@ public class Classe implements Persistente {
         }
 
         sb.append("\n}");
-        
-        saida.append(sb.toString());
+
+        saida.substituteFor(sb);
     }
 
     public String getNome() {
@@ -105,6 +110,18 @@ public class Classe implements Persistente {
 
     public Classe setCaminhoPacote(String caminhoPacote) {
         this.caminhoPacote = caminhoPacote;
+        return this;
+    }
+
+    public String getCaminhoDiretorio() {
+        return this.caminhoDiretorio;
+    }
+
+    public Classe setCaminhoDiretorio(String caminhoDiretorio) {
+        this.caminhoDiretorio = caminhoDiretorio;
+        if (this.caminhoDiretorio.charAt(this.caminhoDiretorio.length() - 1) != '/') {
+            this.caminhoDiretorio += "/";
+        }
         return this;
     }
 

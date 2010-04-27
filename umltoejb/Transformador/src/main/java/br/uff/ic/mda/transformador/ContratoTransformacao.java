@@ -36,8 +36,16 @@ public class ContratoTransformacao
             throw new Exception("Dominios fornecidos não equivalem aos utilizados na transformacao e na geração de código.");
         }
 
-        transformador.transform();
-        // Falta a parte dos validadores
-        geradorCodigo.generate();
+        if (dominioOrigem.checkAllInvariants()) {
+            transformador.transform();
+        } else {
+            throw new Exception("Invariantes do dominio de origem nao passaram.");
+        }
+
+        if (dominioJuncao.checkAllInvariants() && dominioDestino.checkAllInvariants()) {
+            geradorCodigo.generate();
+        } else {
+            throw new Exception("Invariantes do dominio de destino ou juncao nao passaram.");
+        }
     }
 }

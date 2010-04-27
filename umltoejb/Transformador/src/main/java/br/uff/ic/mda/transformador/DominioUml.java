@@ -54,7 +54,7 @@ public class DominioUml extends Dominio {
 
         // Todo Feature precisa ter uma Class
         this.insertInvariant("restrictionRequiredAssociationFeatureToClass",
-                "Feature.allInstances()->forAll( f : Feature | not f.class->includes(NULL_CLASS))");
+                "Feature.allInstances()->forAll(f : Feature | not f.class->includes(NULL_CLASS))");
 
         // Todo Parameter precisa ter uma Operation
         this.insertInvariant("restrictionRequiredAssociationParameterToOperation",
@@ -66,8 +66,12 @@ public class DominioUml extends Dominio {
                 "AssociationEnd.allInstances().association->forAll(a : Association | a <> NULL_ASSOCIATION)");
 
         // Todo Association precisa ter, no minimo, 1 AssociationEnd
-        this.insertInvariant("restrictionRequiredMinimunTwoAssociationEndPerPerson",
-                "Association.allInstances()->excluding(NULL_ASSOCIATION)->forAll( a : Association | a.associationEnds->size() >= 1)");
+        this.insertInvariant("restrictionMinimunOneAssociationEndPerAssociation",
+                "Association.allInstances()->excluding(NULL_ASSOCIATION)->forAll(a : Association | a.associationEnds->size() >= 1)");
+
+        // Nao pode ter ciclos na hierarquia de heranca de classes
+        this.insertInvariant("noCyclesinClassHierarchy",
+                "Class.allInstances()->excluding(NULL_CLASS)->forAll(c : Class | c.inheritsFrom->forAll(r : Class | r.superPlus()->excludes(c)))");
 
     }
 
@@ -80,8 +84,7 @@ public class DominioUml extends Dominio {
         String[] param;
 
         result &= this.ieos.insertOperation("Class", "getAllContained", "Set(Class)",
-                "Class.allInstances()->select(c | c.subindo(c.emptySet())->includes(self))"
-                , new Object[0]);
+                "Class.allInstances()->select(c | c.subindo(c.emptySet())->includes(self))", new Object[0]);
 
         result &= this.ieos.insertOperation("Class", "subindo", "Set(Class)",
                 "if self.oclIsTypeOf(Class) "
@@ -109,7 +112,7 @@ public class DominioUml extends Dominio {
                 + ".subindo(lista->including(self))"
                 + " else "
                 + "lista->including(self)"
-                + " endif", new Object[]{new String[]{"lista","Set(Class)"}});
+                + " endif", new Object[]{new String[]{"lista", "Set(Class)"}});
 
         result &= this.ieos.insertOperation("AssociationClass", "subindoAssociationClass", "Set(Class)",
                 "if "
@@ -210,7 +213,22 @@ public class DominioUml extends Dominio {
         result &= this.ieos.insertOperation("Class", "getAllOuterMostContainer", "Set(Class)",
                 "Class.allInstances()->select(c : Class | c.isOuterMostContainer())->asSet()", new Object[0]);
 
+        result &= this.ieos.insertOperation("Class", "superPlus", "Set(Class)",
+                "self.superPlusOnSet(self.emptySet())", new Object[0]);
 
+        // Versao que o Christiano mandou
+//        result &= this.ieos.insertOperation("Class", "superPlusOnSet", "Set(Class)",
+//                "if self.inheritsFrom->exists(r : Class | rs->excludes(r)) then "
+//                    + "self.superPlusOnSet(rs->union(rs.inheritsFrom)->asSet())"
+//                + " else "
+//                    + "rs->including(self)"
+//                + " endif", new Object[]{new String[]{"rs", "Set(Class)"}});
+        result &= this.ieos.insertOperation("Class", "superPlusOnSet", "Set(Class)",
+                "if self.inheritsFrom->notEmpty() and rs->excludes(self) then "
+                    + "self.inheritsFrom->collect(c : Class | c.superPlusOnSet(rs->including(self)))->flatten()->asSet()"
+                + " else "
+                    + "rs->including(self)"
+                + " endif", new Object[]{new String[]{"rs", "Set(Class)"}});
 
         if (!result) {
             throw new Exception("It was not possible to insert all the operations in the UML model");
@@ -259,6 +277,7 @@ public class DominioUml extends Dominio {
         this.ieos.insertAssociation("Operation", "operation", "1", "*", "parameter", "Parameter");
         this.ieos.insertAssociation("Class", "class", "0..1", "*", "feature", "Feature");
         this.ieos.insertAssociation("Class", "classes", "*", "*", "implementedInterfaces", "Interface");
+        this.ieos.insertAssociation("Class", "inheritsFrom", "*", "*", "inheritedBy", "Class");
         this.ieos.insertAssociation("Classifier", "classifier", "0..1", "*", "types", "Typed");
         this.ieos.insertAssociation("Conjunto", "setA", "0..*", "1", "elementType", "Classifier");
     }
@@ -297,6 +316,16 @@ public class DominioUml extends Dominio {
         this.ieos.insertObject("Class", id);
         // Colocando o nome (Classifier) do objeto no campo 'name'
         this.ieos.insertValue("Class", "name", id, name == null ? "" : name);
+        return true;
+    }
+
+    public boolean insertClassInheritance(String idPai, String idFilho) throws Exception {
+        if (this.ieos.getActualState() != 3) {
+            logger.error("Error when insert a class: the UML diagram must be created");
+            return false;
+        }
+        this.ieos.insertLink("Class", idPai, "inheritsFrom", "inheritedBy", idFilho, "Class");
+
         return true;
     }
 
