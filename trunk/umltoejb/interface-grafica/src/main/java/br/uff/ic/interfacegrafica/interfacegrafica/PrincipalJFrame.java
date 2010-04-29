@@ -144,8 +144,10 @@ public class PrincipalJFrame extends javax.swing.JFrame {
         aUml.insertAttribute("login_u_ID", "login", "public", "UMLString", "User_ID");
         aUml.insertAttribute("password_u_ID", "password", "public", "UMLString", "User_ID");
         aUml.insertAttribute("email_u_ID", "email", "public", "UMLString", "User_ID");
+
         aUml.insertAttribute("title_a_ID", "title", "public", "UMLString", "Article_ID");
         aUml.insertAttribute("text_a_ID", "text", "public", "UMLString", "Article_ID");
+
         aUml.insertAttribute("name_c_ID", "name", "public", "UMLString", "Comment_ID");
         aUml.insertAttribute("email_c_ID", "email", "public", "UMLString", "Comment_ID");
         aUml.insertAttribute("website_c_ID", "website", "public", "UMLString", "Comment_ID");
@@ -161,7 +163,22 @@ public class PrincipalJFrame extends javax.swing.JFrame {
         aUml.insertLinksBetweenAssociationEnds("article_ac_ID", "comment_ac_ID");
         aUml.insertAssociation("article_comment_ID", "has", "article_ac_ID", "comment_ac_ID");
 
+        aUml.insertOperation("findByLoginAndPassword_ID", "findByLoginAndPassword", "public", "User_ID", "User_ID");
+        aUml.insertParameter("flp_login_ID", "login", "UMLString", "findByLoginAndPassword_ID");
+        aUml.insertParameter("flp_password_ID", "password", "UMLString", "findByLoginAndPassword_ID");
+
         aUml.insertOperation("postNewArticle_ID", "postNewArticle", "public", "UMLBoolean", "User_ID");
+        aUml.insertParameter("pna_title_ID", "title", "UMLString", "postNewArticle_ID");
+        aUml.insertParameter("pna_text_ID", "text", "UMLString", "postNewArticle_ID");
+
+        aUml.insertOperation("commentArticle_ID", "commentArticle", "public", "UMLBoolean", "Article_ID");
+        aUml.insertParameter("ca_name_ID", "name", "UMLString", "commentArticle_ID");
+        aUml.insertParameter("ca_email_ID", "email", "UMLString", "commentArticle_ID");
+        aUml.insertParameter("ca_website_ID", "website", "UMLString", "commentArticle_ID");
+        aUml.insertParameter("ca_text_ID", "text", "UMLString", "commentArticle_ID");
+
+        aUml.insertSet("setArticles_ID", "SetArticle", "Article_ID");
+        aUml.insertOperation("findAllArticles_ID", "findAll", "public", "setArticles_ID", "Article_ID");
     }
 
     private void criarDiagramaUmlTesteHeranca() throws Exception {
