@@ -64,11 +64,11 @@ public class Method implements Nonpersistent {
         return this;
     }
 
-    public String getRetornType() {
+    public String getReturnType() {
         return returnType;
     }
 
-    public Method setRetorno(String returnType) {
+    public Method setReturnType(String returnType) {
         this.returnType = returnType;
         return this;
     }

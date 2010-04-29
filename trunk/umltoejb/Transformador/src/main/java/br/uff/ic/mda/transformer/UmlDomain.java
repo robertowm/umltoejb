@@ -48,9 +48,9 @@ public class UmlDomain extends Domain {
                 //                "ModelElement.allInstances()->forAll(me : ModelElement | me.name <> '')");
                 "ModelElement.allInstances()->forAll(me : ModelElement | me.name <> '' or me.oclIsKindOf(Association) or me.oclIsKindOf(AssociationEnd))");
 
-        // Todo Conjunto precisa ter um Classifier
-        this.insertInvariant("restrictionRequiredAssociationConjuntoToClassifier",
-                "Conjunto.allInstances()->forAll(c : Conjunto | c.elementType <> NULL_CLASSIFIER)");
+        // Todo UMLSet precisa ter um Classifier
+        this.insertInvariant("restrictionRequiredAssociationUMLSetToClassifier",
+                "UMLSet.allInstances()->forAll(c : UMLSet | c.elementType <> NULL_CLASSIFIER)");
 
         // Todo Feature precisa ter uma Class
         this.insertInvariant("restrictionRequiredAssociationFeatureToClass",
@@ -243,7 +243,7 @@ public class UmlDomain extends Domain {
         this.ieos.insertClass("Classifier");
         this.ieos.insertClass("Typed");
         this.ieos.insertClass("DataType");
-        this.ieos.insertClass("Conjunto");
+        this.ieos.insertClass("UMLSet");
         this.ieos.insertClass("Class");
         this.ieos.insertClass("Interface");
         this.ieos.insertClass("AssociationClass");
@@ -258,7 +258,7 @@ public class UmlDomain extends Domain {
         this.ieos.insertGeneralization("Classifier", "ModelElement");
         this.ieos.insertGeneralization("Typed", "ModelElement");
         this.ieos.insertGeneralization("DataType", "Classifier");
-        this.ieos.insertGeneralization("Conjunto", "DataType");
+        this.ieos.insertGeneralization("UMLSet", "DataType");
         this.ieos.insertGeneralization("Class", "Classifier");
         this.ieos.insertGeneralization("Interface", "Classifier");
         this.ieos.insertGeneralization("AssociationClass", "Class");
@@ -279,7 +279,7 @@ public class UmlDomain extends Domain {
         this.ieos.insertAssociation("Class", "classes", "*", "*", "implementedInterfaces", "Interface");
         this.ieos.insertAssociation("Class", "inheritsFrom", "*", "*", "inheritedBy", "Class");
         this.ieos.insertAssociation("Classifier", "classifier", "0..1", "*", "types", "Typed");
-        this.ieos.insertAssociation("Conjunto", "setA", "0..*", "1", "elementType", "Classifier");
+        this.ieos.insertAssociation("UMLSet", "setA", "0..*", "1", "elementType", "Classifier");
     }
 
     @Override
@@ -347,9 +347,9 @@ public class UmlDomain extends Domain {
             logger.error("Error when insert a set: the UML diagram must be created");
             return false;
         }
-        this.ieos.insertObject("Conjunto", id);
-        this.ieos.insertValue("Conjunto", "name", id, name == null ? "" : name);
-        this.ieos.insertLink("Conjunto", id, "setA", "elementType", elementType, "Classifier");
+        this.ieos.insertObject("UMLSet", id);
+        this.ieos.insertValue("UMLSet", "name", id, name == null ? "" : name);
+        this.ieos.insertLink("UMLSet", id, "setA", "elementType", elementType, "Classifier");
         return true;
     }
 

@@ -15,6 +15,7 @@ public class EjbDomain extends Domain {
         this.ieos.insertClass("EJBTyped");
         this.ieos.insertClass("EJBDataSchema");
         this.ieos.insertClass("EJBDataType");
+        this.ieos.insertClass("EJBSet");
         this.ieos.insertClass("EJBClass");
         this.ieos.insertClass("EJBDataSchemaElement");
         this.ieos.insertClass("EJBKeyClass");
@@ -37,6 +38,7 @@ public class EjbDomain extends Domain {
         this.ieos.insertGeneralization("EJBDataSchema", "EJBModelElement");
         this.ieos.insertGeneralization("EJBDataSchemaElement", "EJBModelElement");
         this.ieos.insertGeneralization("EJBDataType", "EJBClassifier");
+        this.ieos.insertGeneralization("EJBSet", "EJBDataType");
         this.ieos.insertGeneralization("EJBClass", "EJBClassifier");
         this.ieos.insertGeneralization("EJBComponent", "EJBClass");
         this.ieos.insertGeneralization("EJBKeyClass", "EJBClass");
@@ -57,6 +59,7 @@ public class EjbDomain extends Domain {
     public void insertMetamodelAssociations() throws Exception {
         this.ieos.insertAssociation("EJBClassifier", "type", "1", "*", "typed", "EJBTyped");
         this.ieos.insertAssociation("EJBDataSchema", "package", "1", "*", "element", "EJBDataSchemaElement");
+        this.ieos.insertAssociation("EJBSet", "set", "0..*", "1", "elementType", "EJBClassifier");
         this.ieos.insertAssociation("EJBClass", "class", "1", "0..*", "feature", "EJBFeature");
         this.ieos.insertAssociation("EJBEntityComponent", "entityComp", "1", "1..*", "usedTable", "Table");
         this.ieos.insertAssociation("EJBDataAssociation", "association", "0..1", "2", "associationEnds", "EJBAssociationEnd");
@@ -97,6 +100,12 @@ public class EjbDomain extends Domain {
 
         // Toda EJBModelElement precisa que o campo 'name' esteja preenchido, exceto EJBAssociation e EJBAssociationEnd
         this.insertInvariant("restrictionRequiredFieldNameEJBModelElement", "EJBModelElement.allInstances()->forAll(me : EJBModelElement | me.name <> '' or me.oclIsKindOf(EJBDataAssociation) or me.oclIsKindOf(EJBAssociationEnd))");
+
+        // Todo BusinessMethod pertencente a um EJBEntityComponent que comeca seu nome com 'find' deve comecar tambem 'findAll', 'findBy', 'findOne' ou 'findMany'
+        this.insertInvariant("restrictionMethodNametoEJBEntityComponent", "BusinessMethod.allInstances()->select(bm : BusinessMethod | bm.class->exists(c : EJBClass | c.oclIsTypeOf(EJBEntityComponent)))->select(bm : BusinessMethod | bm.name.size() >= 4 and bm.name.substring(1, 4) = 'find')->forAll(bm : BusinessMethod | bm.name.size() >= 7 and (if bm.name.size() = 7 then bm.name = 'findAll' else bm.name.substring(1, 6) = 'findBy' or bm.name.substring(1, 7) = 'findOne' or bm.name.substring(1, 8) = 'findMany' endif))");
+
+        // Todo EJBSet precisa ter um tipo
+        this.insertInvariant("everyEJBSetmusthaveatype", "EJBSet.allInstances()->forAll(s : EJBSet | s.elementType <> NULL_EJBC)");
     }
 
     @Override
@@ -159,6 +168,30 @@ public class EjbDomain extends Domain {
 
         this.ieos.insertObject("EJBDataType", id);
         this.ieos.insertValue("EJBDataType", "name", id, name == null ? "" : name);
+        return true;
+    }
+
+    // EJBSet
+    public boolean insertEJBSet(String id, String name, String idType) throws Exception {
+        return      insertEJBSetStub(id, name)
+                &&  insertEJBSetTypeLink(id, idType);
+    }
+    public boolean insertEJBSetStub(String id, String name) throws Exception {
+        if (this.ieos.getActualState() != 3) {
+            logger.error("Error when insert an EJBDataType: the diagram must be created");
+            return false;
+        }
+
+        this.ieos.insertObject("EJBSet", id);
+        this.ieos.insertValue("EJBSet", "name", id, name == null ? "" : name);
+        return true;
+    }
+    public boolean insertEJBSetTypeLink(String id, String idType) throws Exception {
+        if (this.ieos.getActualState() != 3) {
+            logger.error("Error when insert an EJBDataType: the diagram must be created");
+            return false;
+        }
+        this.ieos.insertLink("EJBSet", id, "set", "elementType", idType, "EJBClassifier");
         return true;
     }
 

@@ -17,7 +17,9 @@ public class UmlEjbDomain extends Domain {
         logger.debug("Inserting Uml MetaModel Invariants");
 
         // Todo DataType precisa de um correspondente EJBDataType
-        this.insertInvariant("everyDataClassMustHaveEJBDataType", "DataType.allInstances()->forAll(dt : DataType | dt.transformerToEjbDataType->notEmpty())");
+        this.insertInvariant("everyDataClassMustHaveEJBDataType", "DataType.allInstances()->select(dt : DataType | dt.oclIsTypeOf(DataType))->forAll(dt : DataType | dt.transformerToEjbDataType->notEmpty())");
+        // Todo UMLSet precisa de um correspondente EJBSet
+        this.insertInvariant("everyUmlSetMustHaveEjbSet", "UMLSet.allInstances()->forAll(s : UMLSet | s.transformerToSet->notEmpty())");
         // Toda Class e AssociationClass precisa de uma EJBKeyClass
         this.insertInvariant("everyClassMustHaveEJBKeyClass", "Class.allInstances()->excluding(NULL_CLASS)->forAll(c : Class | c.transformerToClass->notEmpty())");
         this.insertInvariant("everyAssociationClassMustHaveEJBKeyClass", "AssociationClass.allInstances()->forAll(ac : AssociationClass | ac.transformerToAssociationClass->notEmpty())");
@@ -50,6 +52,7 @@ public class UmlEjbDomain extends Domain {
         this.ieos.insertClass("UMLAssociationEndEmEJBAssociationusingRule10");  // Regra 10
         this.ieos.insertClass("UMLAssociationEndEmEJBAssociationusingRule11");  // Regra 11
         this.ieos.insertClass("UMLClassToEJBEntityComponent");                  // Regra 3
+        this.ieos.insertClass("UMLSetToEJBSet");                          // Minha regra
     }
 
     @Override
@@ -116,6 +119,10 @@ public class UmlEjbDomain extends Domain {
         this.ieos.insertAssociation("EJBDataClass", "dataClass", "1", "0..1", "transformerToEntityComponent", "UMLClassToEJBEntityComponent");
         this.ieos.insertAssociation("EJBDataSchema", "dataSchema", "1", "0..1", "transformerToEntityComponent", "UMLClassToEJBEntityComponent");
         this.ieos.insertAssociation("EJBServingAttribute", "servingAttribute", "1", "0..1", "transformerToEntityComponent", "UMLClassToEJBEntityComponent");
+
+        // Associacoes UMLSetToEJBSet
+        this.ieos.insertAssociation("UMLSet", "umlSet", "1", "0..1", "transformerToSet", "UMLSetToEJBSet");
+        this.ieos.insertAssociation("EJBSet", "ejbSet", "1", "0..1", "transformerToSet", "UMLSetToEJBSet");
     }
 
     @Override
@@ -134,6 +141,7 @@ public class UmlEjbDomain extends Domain {
         this.ieos.insertAttribute("UMLAssociationEndEmEJBAssociationusingRule11", "name", "String");
         this.ieos.insertAttribute("UMLClassToEJBEntityComponent", "name", "String");
         this.ieos.insertAttribute("UMLAssociationClassToEJBDataClass", "name", "String");
+        this.ieos.insertAttribute("UMLSetToEJBSet", "name", "String");
     }
 
     public boolean insertOperationOCL(String contextClass, String nameOperation,
@@ -145,221 +153,236 @@ public class UmlEjbDomain extends Domain {
     // Specific methods of this domain
 
     // UMLDataTypeToEJBDataType
-    public boolean insertUMLDataTypeToEJBDataType(String idUmlDataType, String idEjbDataType) throws Exception {
+    public boolean insertUMLDataTypeToEJBDataType(String umlDataTypeId, String ejbDataTypeId) throws Exception {
         if (this.ieos.getActualState() != 3) {
             logger.error("Error when insert a class: the UML diagram must be created");
             return false;
         }
-        String name = idUmlDataType + "To" + idEjbDataType;
+        String name = umlDataTypeId + "To" + ejbDataTypeId;
         String id = name + System.nanoTime();
         this.ieos.insertObject("UMLDataTypeToEJBDataType", id);
         this.ieos.insertValue("UMLDataTypeToEJBDataType", "name", id, name);
-        this.ieos.insertLink("DataType", idUmlDataType, "dataType", "transformerToEjbDataType", id, "UMLDataTypeToEJBDataType");
-        this.ieos.insertLink("EJBDataType", idEjbDataType, "ejbDataType", "transformerToEjbDataType", id, "UMLDataTypeToEJBDataType");
+        this.ieos.insertLink("DataType", umlDataTypeId, "dataType", "transformerToEjbDataType", id, "UMLDataTypeToEJBDataType");
+        this.ieos.insertLink("EJBDataType", ejbDataTypeId, "ejbDataType", "transformerToEjbDataType", id, "UMLDataTypeToEJBDataType");
         return true;
     }
 
     // UMLClassToEJBKeyClass
-    public boolean insertUMLClassToEJBKeyClass(String idUmlClass, String idEjbKeyClass, String idEjbAttribute) throws Exception {
+    public boolean insertUMLClassToEJBKeyClass(String umlClassId, String ejbKeyClassId, String ejbAttributeId) throws Exception {
         if (this.ieos.getActualState() != 3) {
             logger.error("Error when insert a class: the UML diagram must be created");
             return false;
         }
-        String name = idUmlClass + "To" + idEjbKeyClass;
+        String name = umlClassId + "To" + ejbKeyClassId;
         String id = name + System.nanoTime();
         this.ieos.insertObject("UMLClassToEJBKeyClass", id);
         this.ieos.insertValue("UMLClassToEJBKeyClass", "name", id, name);
-        this.ieos.insertLink("Class", idUmlClass, "class", "transformerToClass", id, "UMLClassToEJBKeyClass");
-        this.ieos.insertLink("EJBKeyClass", idEjbKeyClass, "keyClass", "transformerToClass", id, "UMLClassToEJBKeyClass");
-        this.ieos.insertLink("EJBAttribute", idEjbAttribute, "id", "transformerToClass", id, "UMLClassToEJBKeyClass");
+        this.ieos.insertLink("Class", umlClassId, "class", "transformerToClass", id, "UMLClassToEJBKeyClass");
+        this.ieos.insertLink("EJBKeyClass", ejbKeyClassId, "keyClass", "transformerToClass", id, "UMLClassToEJBKeyClass");
+        this.ieos.insertLink("EJBAttribute", ejbAttributeId, "id", "transformerToClass", id, "UMLClassToEJBKeyClass");
         return true;
     }
 
     // UMLAssociationClassToEJBKeyClass
-    public boolean insertUMLAssociationClassToEJBKeyClass(String idUmlClass, String idEjbKeyClass, String idEjbAttribute1, String idEjbAttribute2) throws Exception {
+    public boolean insertUMLAssociationClassToEJBKeyClass(String umlClassId, String ejbKeyClassId, String ejbAttribute1Id, String ejbAttribute2Id) throws Exception {
         if (this.ieos.getActualState() != 3) {
             logger.error("Error when insert a class: the UML diagram must be created");
             return false;
         }
-        String name = idUmlClass + "To" + idEjbKeyClass;
+        String name = umlClassId + "To" + ejbKeyClassId;
         String id = name + System.nanoTime();
         this.ieos.insertObject("UMLAssociationClassToEJBKeyClass", id);
         this.ieos.insertValue("UMLAssociationClassToEJBKeyClass", "name", id, name);
-        this.ieos.insertLink("AssociationClass", idUmlClass, "associationClass", "transformerToAssociationClass", id, "UMLAssociationClassToEJBKeyClass");
-        this.ieos.insertLink("EJBKeyClass", idEjbKeyClass, "keyClass", "transformerToAssociationClass", id, "UMLAssociationClassToEJBKeyClass");
-        this.ieos.insertLink("EJBAttribute", idEjbAttribute1, "id", "transformerToAssociationClass", id, "UMLAssociationClassToEJBKeyClass");
-        this.ieos.insertLink("EJBAttribute", idEjbAttribute2, "id", "transformerToAssociationClass", id, "UMLAssociationClassToEJBKeyClass");
+        this.ieos.insertLink("AssociationClass", umlClassId, "associationClass", "transformerToAssociationClass", id, "UMLAssociationClassToEJBKeyClass");
+        this.ieos.insertLink("EJBKeyClass", ejbKeyClassId, "keyClass", "transformerToAssociationClass", id, "UMLAssociationClassToEJBKeyClass");
+        this.ieos.insertLink("EJBAttribute", ejbAttribute1Id, "id", "transformerToAssociationClass", id, "UMLAssociationClassToEJBKeyClass");
+        this.ieos.insertLink("EJBAttribute", ejbAttribute2Id, "id", "transformerToAssociationClass", id, "UMLAssociationClassToEJBKeyClass");
         return true;
     }
 
     // UMLParameterToEJBParameter
-    public boolean insertUMLParameterToEJBParameter(String idUmlParameter, String idEjbParameter) throws Exception {
+    public boolean insertUMLParameterToEJBParameter(String umlParameterId, String ejbParameterId) throws Exception {
         if (this.ieos.getActualState() != 3) {
             logger.error("Error when insert a class: the UML diagram must be created");
             return false;
         }
-        String name = idUmlParameter + "To" + idEjbParameter;
+        String name = umlParameterId + "To" + ejbParameterId;
         String id = name + System.nanoTime();
         this.ieos.insertObject("UMLParameterToEJBParameter", id);
         this.ieos.insertValue("UMLParameterToEJBParameter", "name", id, name);
-        this.ieos.insertLink("Parameter", idUmlParameter, "parameter", "transformerToEjbParameter", id, "UMLParameterToEJBParameter");
-        this.ieos.insertLink("EJBParameter", idEjbParameter, "ejbParameter", "transformerToEjbParameter", id, "UMLParameterToEJBParameter");
+        this.ieos.insertLink("Parameter", umlParameterId, "parameter", "transformerToEjbParameter", id, "UMLParameterToEJBParameter");
+        this.ieos.insertLink("EJBParameter", ejbParameterId, "ejbParameter", "transformerToEjbParameter", id, "UMLParameterToEJBParameter");
         return true;
     }
 
     // UMLOperationToBusinessMethod
-    public boolean insertUMLOperationToBusinessMethod(String idUmlOperation, String idBusinessMethod) throws Exception {
+    public boolean insertUMLOperationToBusinessMethod(String umlOperationId, String businessMethodId) throws Exception {
         if (this.ieos.getActualState() != 3) {
             logger.error("Error when insert a class: the UML diagram must be created");
             return false;
         }
-        String name = idUmlOperation + "To" + idBusinessMethod;
+        String name = umlOperationId + "To" + businessMethodId;
         String id = name + System.nanoTime();
         this.ieos.insertObject("UMLOperationToBusinessMethod", id);
         this.ieos.insertValue("UMLOperationToBusinessMethod", "name", id, name);
-        this.ieos.insertLink("Operation", idUmlOperation, "operation", "transformerToBusinessMethod", id, "UMLOperationToBusinessMethod");
-        this.ieos.insertLink("BusinessMethod", idBusinessMethod, "businessMethod", "transformerToBusinessMethod", id, "UMLOperationToBusinessMethod");
+        this.ieos.insertLink("Operation", umlOperationId, "operation", "transformerToBusinessMethod", id, "UMLOperationToBusinessMethod");
+        this.ieos.insertLink("BusinessMethod", businessMethodId, "businessMethod", "transformerToBusinessMethod", id, "UMLOperationToBusinessMethod");
         return true;
     }
 
     // UMLAttributeToEJBAttribute
-    public boolean insertUMLAttributeToEJBAttribute(String idUmlAttribute, String idEjbAttribute) throws Exception {
+    public boolean insertUMLAttributeToEJBAttribute(String umlAttributeId, String ejbAttributeId) throws Exception {
         if (this.ieos.getActualState() != 3) {
             logger.error("Error when insert a class: the UML diagram must be created");
             return false;
         }
-        String name = idUmlAttribute + "To" + idEjbAttribute;
+        String name = umlAttributeId + "To" + ejbAttributeId;
         String id = name + System.nanoTime();
         this.ieos.insertObject("UMLAttributeToEJBAttribute", id);
         this.ieos.insertValue("UMLAttributeToEJBAttribute", "name", id, name);
-        this.ieos.insertLink("Attribute", idUmlAttribute, "attribute", "transformerToEjbAttribute", id, "UMLAttributeToEJBAttribute");
-        this.ieos.insertLink("EJBAttribute", idEjbAttribute, "ejbAttribute", "transformerToEjbAttribute", id, "UMLAttributeToEJBAttribute");
+        this.ieos.insertLink("Attribute", umlAttributeId, "attribute", "transformerToEjbAttribute", id, "UMLAttributeToEJBAttribute");
+        this.ieos.insertLink("EJBAttribute", ejbAttributeId, "ejbAttribute", "transformerToEjbAttribute", id, "UMLAttributeToEJBAttribute");
         return true;
     }
 
     // UMLClassToEJBDataClass
-    public boolean insertUMLClassToEJBDataClass(String idUmlClass, String idEjbDataClass) throws Exception {
+    public boolean insertUMLClassToEJBDataClass(String umlClassId, String ejbDataClassId) throws Exception {
         if (this.ieos.getActualState() != 3) {
             logger.error("Error when insert a class: the UML diagram must be created");
             return false;
         }
-        String name = idUmlClass + "To" + idEjbDataClass;
+        String name = umlClassId + "To" + ejbDataClassId;
         String id = name + System.nanoTime();
         this.ieos.insertObject("UMLClassToEJBDataClass", id);
         this.ieos.insertValue("UMLClassToEJBDataClass", "name", id, name);
-        this.ieos.insertLink("Class", idUmlClass, "class", "transformerToEjbDataClass", id, "UMLClassToEJBDataClass");
-        this.ieos.insertLink("EJBDataClass", idEjbDataClass, "ejbDataClass", "transformerToEjbDataClass", id, "UMLClassToEJBDataClass");
+        this.ieos.insertLink("Class", umlClassId, "class", "transformerToEjbDataClass", id, "UMLClassToEJBDataClass");
+        this.ieos.insertLink("EJBDataClass", ejbDataClassId, "ejbDataClass", "transformerToEjbDataClass", id, "UMLClassToEJBDataClass");
         return true;
     }
 
     // UMLAssociationToEJBDataAssociation
-    public boolean insertUMLAssociationToEJBDataAssociation(String idUmlAssociation, String idEjbDataAssociation) throws Exception {
+    public boolean insertUMLAssociationToEJBDataAssociation(String umlAssociationId, String ejbDataAssociationId) throws Exception {
         if (this.ieos.getActualState() != 3) {
             logger.error("Error when insert a class: the UML diagram must be created");
             return false;
         }
-        String name = idUmlAssociation + "To" + idEjbDataAssociation;
+        String name = umlAssociationId + "To" + ejbDataAssociationId;
         String id = name + System.nanoTime();
         this.ieos.insertObject("UMLAssociationToEJBDataAssociation", id);
         this.ieos.insertValue("UMLAssociationToEJBDataAssociation", "name", id, name);
-        this.ieos.insertLink("Association", idUmlAssociation, "association", "transformerToEjbDataAssociationusingRule5", id, "UMLAssociationToEJBDataAssociation");
-        this.ieos.insertLink("EJBDataAssociation", idEjbDataAssociation, "ejbDataAssociation", "transformerToEjbDataAssociationusingRule5", id, "UMLAssociationToEJBDataAssociation");
+        this.ieos.insertLink("Association", umlAssociationId, "association", "transformerToEjbDataAssociationusingRule5", id, "UMLAssociationToEJBDataAssociation");
+        this.ieos.insertLink("EJBDataAssociation", ejbDataAssociationId, "ejbDataAssociation", "transformerToEjbDataAssociationusingRule5", id, "UMLAssociationToEJBDataAssociation");
         return true;
     }
 
     // UMLAssociationClassToEJBDataClass
-    public boolean insertUMLAssociationClassToEJBDataClass(String idUmlAssociationClass, String idEjbDataClass) throws Exception {
+    public boolean insertUMLAssociationClassToEJBDataClass(String umlAssociationClassId, String ejbDataClassId) throws Exception {
         if (this.ieos.getActualState() != 3) {
             logger.error("Error when insert a class: the UML diagram must be created");
             return false;
         }
 
-        String name = idUmlAssociationClass + "To" + idEjbDataClass;
+        String name = umlAssociationClassId + "To" + ejbDataClassId;
         String id = name + System.nanoTime();
         this.ieos.insertObject("UMLAssociationClassToEJBDataClass", id);
         this.ieos.insertValue("UMLAssociationClassToEJBDataClass", "name", id, name);
-        this.ieos.insertLink("AssociationClass", idUmlAssociationClass, "associationClass", "transformerToEjbDataClassfromAssociationClass", id, "UMLAssociationClassToEJBDataClass");
-        this.ieos.insertLink("EJBDataClass", idEjbDataClass, "ejbDataClass", "transformerToEjbDataClassfromAssociationClass", id, "UMLAssociationClassToEJBDataClass");
+        this.ieos.insertLink("AssociationClass", umlAssociationClassId, "associationClass", "transformerToEjbDataClassfromAssociationClass", id, "UMLAssociationClassToEJBDataClass");
+        this.ieos.insertLink("EJBDataClass", ejbDataClassId, "ejbDataClass", "transformerToEjbDataClassfromAssociationClass", id, "UMLAssociationClassToEJBDataClass");
         return true;
     }
 
     // UMLAssociationEndToEJBDataEndusingRule8
-    public boolean insertUMLAssociationEndToEJBDataEndusingRule8(String idUmlAssociationEnd, String idEjbAssociationEnd) throws Exception {
+    public boolean insertUMLAssociationEndToEJBDataEndusingRule8(String umlAssociationEndId, String ejbAssociationEndId) throws Exception {
         if (this.ieos.getActualState() != 3) {
             logger.error("Error when insert a class: the UML diagram must be created");
             return false;
         }
-        String name = idUmlAssociationEnd + "To" + idEjbAssociationEnd;
+        String name = umlAssociationEndId + "To" + ejbAssociationEndId;
         String id = name + System.nanoTime();
         this.ieos.insertObject("UMLAssociationEndToEJBDataEndusingRule8", id);
         this.ieos.insertValue("UMLAssociationEndToEJBDataEndusingRule8", "name", id, name);
-        this.ieos.insertLink("AssociationEnd", idUmlAssociationEnd, "associationEnd", "transformerToEjbAssociationEndusingRule8", id, "UMLAssociationEndToEJBDataEndusingRule8");
-        this.ieos.insertLink("EJBAssociationEnd", idEjbAssociationEnd, "ejbAssociationEnd", "transformerToEjbAssociationEndusingRule8", id, "UMLAssociationEndToEJBDataEndusingRule8");
+        this.ieos.insertLink("AssociationEnd", umlAssociationEndId, "associationEnd", "transformerToEjbAssociationEndusingRule8", id, "UMLAssociationEndToEJBDataEndusingRule8");
+        this.ieos.insertLink("EJBAssociationEnd", ejbAssociationEndId, "ejbAssociationEnd", "transformerToEjbAssociationEndusingRule8", id, "UMLAssociationEndToEJBDataEndusingRule8");
         return true;
     }
 
     // UMLAssociationEndToEJBDataEndusingRule9
-    public boolean insertUMLAssociationEndToEJBDataEndusingRule9(String idUmlAssociationEnd, String idEjbAssociationEnd) throws Exception {
+    public boolean insertUMLAssociationEndToEJBDataEndusingRule9(String umlAssociationEndId, String ejbAssociationEndId) throws Exception {
         if (this.ieos.getActualState() != 3) {
             logger.error("Error when insert a class: the UML diagram must be created");
             return false;
         }
-        String name = idUmlAssociationEnd + "To" + idEjbAssociationEnd;
+        String name = umlAssociationEndId + "To" + ejbAssociationEndId;
         String id = name + System.nanoTime();
         this.ieos.insertObject("UMLAssociationEndToEJBDataEndusingRule9", id);
         this.ieos.insertValue("UMLAssociationEndToEJBDataEndusingRule9", "name", id, name);
-        this.ieos.insertLink("AssociationEnd", idUmlAssociationEnd, "associationEnd", "transformerToEjbAssociationEndusingRule9", id, "UMLAssociationEndToEJBDataEndusingRule9");
-        this.ieos.insertLink("EJBAssociationEnd", idEjbAssociationEnd, "ejbAssociationEnd", "transformerToEjbAssociationEndusingRule9", id, "UMLAssociationEndToEJBDataEndusingRule9");
+        this.ieos.insertLink("AssociationEnd", umlAssociationEndId, "associationEnd", "transformerToEjbAssociationEndusingRule9", id, "UMLAssociationEndToEJBDataEndusingRule9");
+        this.ieos.insertLink("EJBAssociationEnd", ejbAssociationEndId, "ejbAssociationEnd", "transformerToEjbAssociationEndusingRule9", id, "UMLAssociationEndToEJBDataEndusingRule9");
         return true;
     }
 
     // UMLAssociationEndEmEJBAssociationusingRule10
-    public boolean insertUMLAssociationEndEmEJBAssociationusingRule10(String idUmlAssociationEnd, String idEjbAssociation, String idEjbAssociationEnd1, String idEjbAssociationEnd2) throws Exception {
+    public boolean insertUMLAssociationEndEmEJBAssociationusingRule10(String umlAssociationEndId, String ejbAssociationId, String ejbAssociationEnd1Id, String ejbAssociationEnd2Id) throws Exception {
         if (this.ieos.getActualState() != 3) {
             logger.error("Error when insert a class: the UML diagram must be created");
             return false;
         }
-        String name = idUmlAssociationEnd + "To" + idEjbAssociation;
+        String name = umlAssociationEndId + "To" + ejbAssociationId;
         String id = name + System.nanoTime();
         this.ieos.insertObject("UMLAssociationEndEmEJBAssociationusingRule10", id);
         this.ieos.insertValue("UMLAssociationEndEmEJBAssociationusingRule10", "name", id, name);
-        this.ieos.insertLink("AssociationEnd", idUmlAssociationEnd, "associationEnd", "transformerToEjbDataAssociationusingRule10", id, "UMLAssociationEndEmEJBAssociationusingRule10");
-        this.ieos.insertLink("EJBDataAssociation", idEjbAssociation, "ejbDataAssociation", "transformerToEjbDataAssociationusingRule10", id, "UMLAssociationEndEmEJBAssociationusingRule10");
-        this.ieos.insertLink("EJBAssociationEnd", idEjbAssociationEnd1, "ejbAssociationEnd1", "transformerToEjbDataAssociationusingRule10_1", id, "UMLAssociationEndEmEJBAssociationusingRule10");
-        this.ieos.insertLink("EJBAssociationEnd", idEjbAssociationEnd2, "ejbAssociationEnd2", "transformerToEjbDataAssociationusingRule10_2", id, "UMLAssociationEndEmEJBAssociationusingRule10");
+        this.ieos.insertLink("AssociationEnd", umlAssociationEndId, "associationEnd", "transformerToEjbDataAssociationusingRule10", id, "UMLAssociationEndEmEJBAssociationusingRule10");
+        this.ieos.insertLink("EJBDataAssociation", ejbAssociationId, "ejbDataAssociation", "transformerToEjbDataAssociationusingRule10", id, "UMLAssociationEndEmEJBAssociationusingRule10");
+        this.ieos.insertLink("EJBAssociationEnd", ejbAssociationEnd1Id, "ejbAssociationEnd1", "transformerToEjbDataAssociationusingRule10_1", id, "UMLAssociationEndEmEJBAssociationusingRule10");
+        this.ieos.insertLink("EJBAssociationEnd", ejbAssociationEnd2Id, "ejbAssociationEnd2", "transformerToEjbDataAssociationusingRule10_2", id, "UMLAssociationEndEmEJBAssociationusingRule10");
         return true;
     }
 
     // UMLAssociationEndEmEJBAssociationusingRule11
-    public boolean insertUMLAssociationEndEmEJBAssociationusingRule11(String idUmlAssociationEnd, String idEjbAssociationEnd2) throws Exception {
+    public boolean insertUMLAssociationEndEmEJBAssociationusingRule11(String umlAssociationEndId, String ejbAssociationEnd2Id) throws Exception {
         if (this.ieos.getActualState() != 3) {
             logger.error("Error when insert a class: the UML diagram must be created");
             return false;
         }
-        String name = idUmlAssociationEnd + "To" + idEjbAssociationEnd2;
+        String name = umlAssociationEndId + "To" + ejbAssociationEnd2Id;
         String id = name + System.nanoTime();
         this.ieos.insertObject("UMLAssociationEndEmEJBAssociationusingRule11", id);
         this.ieos.insertValue("UMLAssociationEndEmEJBAssociationusingRule11", "name", id, name);
-        this.ieos.insertLink("AssociationEnd", idUmlAssociationEnd, "associationEnd", "transformerToEjbDataAssociationusingRule11", id, "UMLAssociationEndEmEJBAssociationusingRule11");
-        this.ieos.insertLink("EJBAssociationEnd", idEjbAssociationEnd2, "ejbAssociationEnd2", "transformerToEjbDataAssociationusingRule11", id, "UMLAssociationEndEmEJBAssociationusingRule11");
+        this.ieos.insertLink("AssociationEnd", umlAssociationEndId, "associationEnd", "transformerToEjbDataAssociationusingRule11", id, "UMLAssociationEndEmEJBAssociationusingRule11");
+        this.ieos.insertLink("EJBAssociationEnd", ejbAssociationEnd2Id, "ejbAssociationEnd2", "transformerToEjbDataAssociationusingRule11", id, "UMLAssociationEndEmEJBAssociationusingRule11");
         return true;
     }
 
     // UMLClassToEJBEntityComponent
-    public boolean insertUMLClassToEJBEntityComponent(String idUmlClass, String idEjbEntityComponent, String idEjbDataClass, String idEjbDataSchema, String idEjbServingAttribute) throws Exception {
+    public boolean insertUMLClassToEJBEntityComponent(String umlClassId, String ejbEntityComponentId, String ejbDataClassId, String ejbDataSchemaId, String ejbServingAttributeId) throws Exception {
         if (this.ieos.getActualState() != 3) {
             logger.error("Error when insert a class: the UML diagram must be created");
             return false;
         }
-        String name = idUmlClass + "To" + idEjbEntityComponent;
+        String name = umlClassId + "To" + ejbEntityComponentId;
         String id = name + System.nanoTime();
         this.ieos.insertObject("UMLClassToEJBEntityComponent", id);
         this.ieos.insertValue("UMLClassToEJBEntityComponent", "name", id, name);
-        this.ieos.insertLink("Class", idUmlClass, "class", "transformerToEntityComponent", id, "UMLClassToEJBEntityComponent");
-        this.ieos.insertLink("EJBEntityComponent", idEjbEntityComponent, "entityComponent", "transformerToEntityComponent", id, "UMLClassToEJBEntityComponent");
-        this.ieos.insertLink("EJBDataClass", idEjbDataClass, "dataClass", "transformerToEntityComponent", id, "UMLClassToEJBEntityComponent");
-        this.ieos.insertLink("EJBDataSchema", idEjbDataSchema, "dataSchema", "transformerToEntityComponent", id, "UMLClassToEJBEntityComponent");
-        this.ieos.insertLink("EJBServingAttribute", idEjbServingAttribute, "servingAttribute", "transformerToEntityComponent", id, "UMLClassToEJBEntityComponent");
+        this.ieos.insertLink("Class", umlClassId, "class", "transformerToEntityComponent", id, "UMLClassToEJBEntityComponent");
+        this.ieos.insertLink("EJBEntityComponent", ejbEntityComponentId, "entityComponent", "transformerToEntityComponent", id, "UMLClassToEJBEntityComponent");
+        this.ieos.insertLink("EJBDataClass", ejbDataClassId, "dataClass", "transformerToEntityComponent", id, "UMLClassToEJBEntityComponent");
+        this.ieos.insertLink("EJBDataSchema", ejbDataSchemaId, "dataSchema", "transformerToEntityComponent", id, "UMLClassToEJBEntityComponent");
+        this.ieos.insertLink("EJBServingAttribute", ejbServingAttributeId, "servingAttribute", "transformerToEntityComponent", id, "UMLClassToEJBEntityComponent");
+        return true;
+    }
+
+    // UMLSetToEJBSet
+    public boolean insertUMLSetToEJBSet(String umlSetId, String ejbSetId) throws Exception {
+        if (this.ieos.getActualState() != 3) {
+            logger.error("Error when insert a class: the UML diagram must be created");
+            return false;
+        }
+        String name = umlSetId + "To" + ejbSetId;
+        String id = name + System.nanoTime();
+        this.ieos.insertObject("UMLSetToEJBSet", id);
+        this.ieos.insertValue("UMLSetToEJBSet", "name", id, name);
+        this.ieos.insertLink("UMLSet", umlSetId, "umlSet", "transformerToSet", id, "UMLSetToEJBSet");
+        this.ieos.insertLink("EJBSet", ejbSetId, "ejbSet", "transformerToSet", id, "UMLSetToEJBSet");
         return true;
     }
 }

@@ -166,7 +166,7 @@ public class Interface implements Persistent {
     }
 
     public Interface addMethod(String type, String name, Parameter... parameters) {
-        Method metodo = new Method().setVisibility("public").setRetorno(type).setName(name, true);
+        Method metodo = new Method().setVisibility("public").setReturnType(type).setName(name, true);
         for (Parameter parametro : parameters) {
             metodo.addParameter(parametro);
         }
