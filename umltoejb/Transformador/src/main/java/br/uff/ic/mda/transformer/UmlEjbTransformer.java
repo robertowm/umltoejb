@@ -19,6 +19,11 @@ public class UmlEjbTransformer extends Transformer<UmlDomain, EjbDomain, UmlEjbD
         if (result != null && result.length > 0 && !"".equals(result[0])) {
             return processQueryResult(intermediateDomain.query(result[0] + ".ejbDataType"))[0];
         }
+        // Procura por um UMLSet -> EJBSet
+        result = processQueryResult(intermediateDomain.query("UMLSetToEJBSet.allInstances()->select(a | a.umlSet->exists(s : UMLSet | s = " + umlId + "))"));
+        if (result != null && result.length > 0 && !"".equals(result[0])) {
+            return processQueryResult(intermediateDomain.query(result[0] + ".ejbSet"))[0];
+        }
         return null;
     }
 
@@ -140,6 +145,7 @@ public class UmlEjbTransformer extends Transformer<UmlDomain, EjbDomain, UmlEjbD
         transformRule11UMLAssociationEndtoEJBAssociation();   // Regra 11
         transformRuleUMLOperationtoBusinessMethod();          // Regra 12
         transformRuleUMLParametertoEJBParameter();            // Regra 13
+        transformUMLSettoEJBSet();                            // Minha regra
 
         // Cria links
         linkUMLClasstoEJBEntityComponent();                // Regra 3
@@ -153,6 +159,7 @@ public class UmlEjbTransformer extends Transformer<UmlDomain, EjbDomain, UmlEjbD
         linkRule11UMLAssociationEndtoEJBAssociation();         // Regra 11
         linkRuleUMLOperationtoBusinessMethod();                // Regra 12
         linkUMLParametertoEJBParameter();                  // Regra 13
+        linkUMLSettoEJBSet();
 
     }
 
@@ -796,13 +803,51 @@ public class UmlEjbTransformer extends Transformer<UmlDomain, EjbDomain, UmlEjbD
         }
     }
     private void linkEJBParameterfromParameter(String id) throws Exception {
-        String umlParameterId = intermediateDomain.query(id + ".parameter").replace("'", "");
-        String umlParameterTypeId = sourceDomain.query(umlParameterId + ".classifier");
+        String umlParameterId = processQueryResult(intermediateDomain.query(id + ".parameter"))[0];
+        String umlParameterTypeId = processQueryResult(sourceDomain.query(umlParameterId + ".classifier"))[0];
 
-        String ejbParameterId = intermediateDomain.query(id + ".ejbParameter").replace("'", "");
+        String ejbParameterId = processQueryResult(intermediateDomain.query(id + ".ejbParameter"))[0];
 
         // umlParameter.type <~> ejbParameter.type
         String ejbParameterTypeId = findEjbIdBasedonUmlId(umlParameterTypeId);
         targetDomain.insertEJBParameterTypeLink(ejbParameterId, ejbParameterTypeId);
+    }
+    //--------------------------------------------------------------------------
+    // MINHA REGRA
+    // Criacao
+    private void transformUMLSettoEJBSet() throws Exception {
+        String[] ids = processQueryResult(sourceDomain.query("UMLSet.allInstances()"));
+
+        for (String id : ids) {
+            String name = sourceDomain.query(id + ".name").replace("'", "");
+            createEJBSetfromUMLSet(id, name);
+        }
+    }
+    private void createEJBSetfromUMLSet(String id, String name) throws Exception {
+        String ejbSetName = name;
+        String ejbSetId = ejbSetName + System.nanoTime();
+
+        targetDomain.insertEJBSetStub(ejbSetId, ejbSetName);
+
+        intermediateDomain.insertUMLSetToEJBSet(id, ejbSetId);
+    }
+    // Linkagem
+    private void linkUMLSettoEJBSet() throws Exception {
+        String[] ids = processQueryResult(intermediateDomain.query("UMLSetToEJBSet.allInstances()"));
+        for (String id : ids) {
+            if (id != null && !"".equals(id)) {
+                linkEJBSetfromUMLSet(id);
+            }
+        }
+    }
+    private void linkEJBSetfromUMLSet(String id) throws Exception {
+        String umlSetId = processQueryResult(intermediateDomain.query(id + ".umlSet"))[0];
+        String umlSetTypeId = processQueryResult(sourceDomain.query(umlSetId + ".elementType"))[0];
+
+        String ejbSetId = processQueryResult(intermediateDomain.query(id + ".ejbSet"))[0];
+
+        // umlSet.type <~> ejbSet.type
+        String ejbSetTypeId = findEjbDataClassBasedonUmlId(umlSetTypeId);
+        targetDomain.insertEJBSetTypeLink(ejbSetId, ejbSetTypeId);
     }
 }
