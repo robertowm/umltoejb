@@ -14,7 +14,7 @@ First, you have to download the dependencies:
   * slf4j-api-1.5.11.jar - Download
   * slf4j-nop-1.5.11.jar - Download
 
-# [http://secumltoaac.sourceforge.net/ XEOS (eXtended Eye ... ....)]
+# [http://secumltoaac.sourceforge.net/ XEOS (eXtended Eye OCL Software)]
   * xeos.jar - Download
   Obs.: This version is customized for this application. Please use this one.
 
