@@ -11,14 +11,16 @@ In this page we describe how to run our tool, the transformer, and documents for
 First, you have to download the dependencies:
 
 # [http://www.slf4j.org/ Simple Logging Facade for Java or (SLF4J)]
-  * slf4j-api-1.5.11.jar - Download
-  * slf4j-nop-1.5.11.jar - Download
+  * slf4j-api-1.5.11.jar - [http://umltoejb.googlecode.com/files/slf4j-nop-1.5.11.jar Download]
+  * slf4j-nop-1.5.11.jar - [http://umltoejb.googlecode.com/files/slf4j-api-1.5.11.jar Download]
 
 # [http://secumltoaac.sourceforge.net/ XEOS (eXtended Eye OCL Software)]
-  * xeos.jar - Download
+  * XEOS.jar - [http://umltoejb.googlecode.com/files/XEOS-1.0-SNAPSHOT.jar Download]
   Obs.: This version is customized for this application. Please use this one.
 
 # Transformer-base
-  * transformer-base.jar - Download
+  * transformer-base.jar - [http://umltoejb.googlecode.com/files/transformer-base-1.0-SNAPSHOT.jar Download]
 
 *Other files will be posted in a while. Just wait a little more :)*
+
+==TO BE CONTINUED==
