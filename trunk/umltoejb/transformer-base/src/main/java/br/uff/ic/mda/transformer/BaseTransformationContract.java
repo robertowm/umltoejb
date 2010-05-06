@@ -6,8 +6,8 @@ import java.util.List;
 public abstract class BaseTransformationContract {
 
     /* Attributes */
-    protected Domain input;
-    protected Domain output;
+    protected BaseDomain input;
+    protected BaseDomain output;
     protected MergedDomain merged;
     protected List<Validator> validators;
 
@@ -31,19 +31,19 @@ public abstract class BaseTransformationContract {
     }
 
     /* Getters and Setters */
-    public Domain getInput() {
+    public BaseDomain getInput() {
         return this.input;
     }
 
-    public void setInput(Domain input) {
+    public void setInput(BaseDomain input) {
         this.input = input;
     }
 
-    public Domain getOutput() {
+    public BaseDomain getOutput() {
         return this.output;
     }
 
-    public void setOutput(Domain output) {
+    public void setOutput(BaseDomain output) {
         this.output = output;
     }
 

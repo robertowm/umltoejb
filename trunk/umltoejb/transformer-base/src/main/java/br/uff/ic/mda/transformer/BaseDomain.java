@@ -2,25 +2,21 @@ package br.uff.ic.mda.transformer;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public abstract class Domain {
+public abstract class BaseDomain {
 
     /* Attributes */
     protected List<DomainValidator> domainValidators;
     protected ModelPersistence modelPersistence;
-    protected Logger logger;
 
     /* Constructors */
-    public Domain(ModelPersistence modelPersistence) {
+    public BaseDomain(ModelPersistence modelPersistence) {
         this(modelPersistence, null);
     }
 
-    public Domain(ModelPersistence modelPersistence, List<DomainValidator> domainValidators) {
+    public BaseDomain(ModelPersistence modelPersistence, List<DomainValidator> domainValidators) {
         this.modelPersistence = modelPersistence;
         this.domainValidators = domainValidators;
-        this.logger = LoggerFactory.getLogger(this.getClass());
     }
 
     /* Methods */

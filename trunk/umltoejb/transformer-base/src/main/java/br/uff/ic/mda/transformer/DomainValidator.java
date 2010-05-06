@@ -6,7 +6,7 @@ import java.util.List;
 public class DomainValidator {
 
     /* Attributes */
-    protected Domain domain;
+    protected BaseDomain domain;
     protected Validator validator;
     protected List<Property> properties;
 
@@ -26,11 +26,11 @@ public class DomainValidator {
     }
 
     /* Getters and Setters */
-    public Domain getDomain() {
+    public BaseDomain getDomain() {
         return this.domain;
     }
 
-    public void setDomain(Domain domain) {
+    public void setDomain(BaseDomain domain) {
         this.domain = domain;
     }
 
