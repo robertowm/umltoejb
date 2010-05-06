@@ -6,40 +6,45 @@
 In this page we describe how to run our tool, the transformer, and documents for a better understanding.
 
 
-= Details =
+= Download and Run =
 
 First, you have to download the dependencies:
 
-# [http://www.slf4j.org/ Simple Logging Facade for Java or (SLF4J)]
+* [http://www.slf4j.org/ Simple Logging Facade for Java or (SLF4J)]
   * slf4j-api-1.5.11.jar - [http://umltoejb.googlecode.com/files/slf4j-nop-1.5.11.jar Download]
   * slf4j-nop-1.5.11.jar - [http://umltoejb.googlecode.com/files/slf4j-api-1.5.11.jar Download]
 
-# [http://secumltoaac.sourceforge.net/ XEOS (eXtended Eye OCL Software)]
+* [http://secumltoaac.sourceforge.net/ XEOS (eXtended Eye OCL Software)]
   * XEOS.jar - [http://umltoejb.googlecode.com/files/XEOS-1.0.jar Download]
   Obs.: This version is customized for this application. Please use this one.
 
-# Transformer-base
+* Transformer-base
   * transformer-base-1.0.jar - [http://umltoejb.googlecode.com/files/transformer-base-1.0.jar Download]
 
-# Transformer
+* Transformer
   * transformer-1.0.jar - [http://umltoejb.googlecode.com/files/transformer-1.0.jar Download]
 
-*If you want the source-code, download the version 1.0 [http://umltoejb.googlecode.com/files/umltoejb-src-1.0.jar here] or [http://code.google.com/p/umltoejb/source/checkout checkout it]. We use [http://netbeans.org/ Netbeans] to develop this tool.*
+`*``*``*`
+_*If you want the source-code, download the version 1.0 [http://umltoejb.googlecode.com/files/umltoejb-src-1.0.jar here] or [http://code.google.com/p/umltoejb/source/checkout checkout it]. We use [http://netbeans.org/ Netbeans] to develop this tool.*_
+`*``*``*`
 
 After this, you can use these files and test the transformer by yourself :)
 
-If you want to compile:
+= Download, Compile and Run =
 
-1) Get the source code:
-1.1) Download it [http://umltoejb.googlecode.com/files/umltoejb-src-1.0.jar here]
-1.2) [http://code.google.com/p/umltoejb/source/checkout Checkout it here]
+If you want to compile this project:
 
-2) Compile using:
-2.1) [http://netbeans.org/ Netbeans]. We use this IDE to develop this tool so we recommend it.
-2.2) [http://maven.apache.org/ Maven]. This project uses Maven so just run this command in the console: mvn compile
-2.3) javac. Use the following commands to compile (runit in the 'umltoejb' folder):
-{{{
+*1) Get the source code:*
+  * Download it [http://umltoejb.googlecode.com/files/umltoejb-src-1.0.jar here]
+  * Checkout it [http://code.google.com/p/umltoejb/source/checkout here]
 
-}}}
+*2) Compile using:*
+  * [http://netbeans.org/ Netbeans]. We use this IDE to develop this tool so we recommend it. If you use an older version, please install the Maven's plugin.
+  * [http://maven.apache.org/ Maven]. This project uses Maven so just run this command in the console: mvn compile
+  * javac. Use the following commands to compile (run it in the 'umltoejb' folder) (In this case, YOU MUST DOWNLOAD ALL SLF4J DEPENDENCIES and put these jar in the 'umltoejb' folder):
+    {{{
+            Under contruction.
+    }}}
 
-3) Test it were you want. The next version (it is already in tests) will read a XMI to load the UML diagram but, for this version (1.0) you need to insert the diagram's elements hardcoded. To help you, see the folder 'interface-grafica'. In this project, it use some diagrams and it can help you building yours while the XMI version is in tests.  The project 'interface-grafica' allows you to query, using OCL, your models so enjoy :)
+*3) Test it were you want!* 
+The next version (it is already in tests) will read a XMI to load the UML diagram but, for this version (1.0) you need to insert the diagram's elements hardcoded. To help you, see the folder 'interface-grafica'. In this project, it use some diagrams and it can help you building yours while the XMI version is in tests.  The project 'interface-grafica' allows you to query, using OCL, your models so enjoy :)
