@@ -48,3 +48,7 @@ If you want to compile this project:
 
 *3) Test it were you want!* 
 The next version (it is already in tests) will read a XMI to load the UML diagram but, for this version (1.0) you need to insert the diagram's elements hardcoded. To help you, see the folder 'interface-grafica'. In this project, it use some diagrams and it can help you building yours while the XMI version is in tests.  The project 'interface-grafica' allows you to query, using OCL, your models so enjoy :)
+
+= Javadoc =
+
+In development but you can download what we have documented in the release 1.0 [http://umltoejb.googlecode.com/files/javadocs-1.0.zip here].
