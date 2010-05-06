@@ -12,7 +12,6 @@ import br.uff.ic.mda.transformer.UmlEjbDomain;
 import br.uff.ic.mda.transformer.EjbCodeGenerator;
 import br.uff.ic.mda.transformer.UmlEjbTransformer;
 import core.XEOS;
-import core.exception.XEOSException;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.logging.Level;
@@ -181,32 +180,6 @@ public class PrincipalJFrame extends javax.swing.JFrame {
         aUml.insertOperation("findAllArticles_ID", "findAll", "public", "setArticles_ID", "Article_ID");
     }
 
-    private void criarDiagramaUmlTesteHeranca() throws Exception {
-        aUml.insertClass("A", "A");
-        aUml.insertClass("B", "B");
-        aUml.insertClass("C", "C");
-        aUml.insertClass("D", "D");
-
-//        aUml.insertClass("T", "T");
-//        aUml.insertClass("E", "E");
-//        aUml.insertClass("F", "F");
-//        aUml.insertClass("G", "G");
-//        aUml.insertClass("H", "H");
-
-        aUml.insertClassInheritance("A", "B");
-        aUml.insertClassInheritance("B", "C");
-        aUml.insertClassInheritance("C", "D");
-        aUml.insertClassInheritance("D", "A");
-
-//        aUml.insertClassInheritance("T", "E");
-//        aUml.insertClassInheritance("T", "F");
-//        aUml.insertClassInheritance("E", "G");
-//        aUml.insertClassInheritance("F", "G");
-//        aUml.insertClassInheritance("G", "H");
-//        aUml.insertClassInheritance("H", "T");
-//        aUml.insertClassInheritance("H", "E");
-    }
-
     /** Creates new form PrincipalJFrame */
     public PrincipalJFrame() throws Exception {
         initComponents();
@@ -214,7 +187,6 @@ public class PrincipalJFrame extends javax.swing.JFrame {
         xeos = new XEOS();
         UmlEjbDomain aJuncao = null;
 
-//        try {
         xeos.createClassDiagram();
 
         aUml = new UmlDomain(xeos);
@@ -242,12 +214,10 @@ public class PrincipalJFrame extends javax.swing.JFrame {
         aJuncao.insertMetamodelInvariants();
 
         xeos.closeClassDiagram();
-//        } catch (XEOSException ex) {
-//            ex.printStackTrace();
-//            System.exit(0);
-//        }
 
-//        try {
+
+
+
         xeos.createObjectDiagram();
 
         aUml.createSpecificationOfCurrentDiagram();
@@ -256,25 +226,11 @@ public class PrincipalJFrame extends javax.swing.JFrame {
 
 //        criarDiagramaObjetosUml();
         criarDiagramaUmlArtigo();
-//        criarDiagramaUmlTesteHeranca();
-//            criarDiagramaObjetosEjb();
 
         TransformationContract ct = new TransformationContract(aUml, aEjb, aJuncao, new UmlEjbTransformer(aUml, aEjb, aJuncao), new EjbCodeGenerator(aEjb, ""));
         ct.transform();
 
         xeos.closeObjectDiagram();
-//        } catch (Exception ex) {
-//            ex.printStackTrace();
-//            System.exit(0);
-//        }
-
-
-
-//        System.out.println(" - Invariantes UML estao OK? " + aUml.checkAllInvariants());
-//        System.out.println(" - Invariantes EJB estao OK? " + aEjb.checkAllInvariants());
-//        System.out.println(" - Invariantes Juncao estao OK? " + aJuncao.checkAllInvariants());
-//        System.exit(0);
-
     }
 
     class ImagePanel extends JPanel {
