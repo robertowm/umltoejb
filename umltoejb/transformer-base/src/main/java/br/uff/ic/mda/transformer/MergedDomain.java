@@ -3,10 +3,10 @@ package br.uff.ic.mda.transformer;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class MergedDomain extends Domain {
+public abstract class MergedDomain extends BaseDomain {
 
     /* Attributes */
-    protected List<Domain> domains;
+    protected List<BaseDomain> domains;
 
     /* Constructors */
     public MergedDomain(ModelPersistence modelPersistence) {
@@ -18,14 +18,14 @@ public abstract class MergedDomain extends Domain {
     }
 
     /* Methods for the list 'domains' */
-    public boolean addDomain(Domain domain) {
+    public boolean addDomain(BaseDomain domain) {
         if (this.domains == null) {
-            this.domains = new ArrayList<Domain>();
+            this.domains = new ArrayList<BaseDomain>();
         }
         return this.domains.add(domain);
     }
 
-    public boolean removeDomain(Domain domain) {
+    public boolean removeDomain(BaseDomain domain) {
         if (this.domains == null) {
             return false;
         }
@@ -33,11 +33,11 @@ public abstract class MergedDomain extends Domain {
     }
 
     /* Getters and Setters */
-    public List<Domain> getDomains() {
+    public List<BaseDomain> getDomains() {
         return this.domains;
     }
 
-    public void setDomains(List<Domain> domains) {
+    public void setDomains(List<BaseDomain> domains) {
         this.domains = domains;
     }
 
