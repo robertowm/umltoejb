@@ -1,6 +1,6 @@
 package core;
 
-import br.uff.ic.mda.transformator.ModelPersistence;
+import br.uff.ic.mda.transformer.ModelPersistence;
 import core.exception.XEOSException;
 import core.oclLex.interpreter.Interpreter;
 import core.oclLex.lexer.Lexer;
@@ -309,7 +309,6 @@ public class XEOS implements ModelPersistence {
         return true;
     }
 
-    @Override
     public String query(String query) throws Exception {
         if (this.actualState >= 3) {
             try {
