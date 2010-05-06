@@ -15,12 +15,31 @@ First, you have to download the dependencies:
   * slf4j-nop-1.5.11.jar - [http://umltoejb.googlecode.com/files/slf4j-api-1.5.11.jar Download]
 
 # [http://secumltoaac.sourceforge.net/ XEOS (eXtended Eye OCL Software)]
-  * XEOS.jar - [http://umltoejb.googlecode.com/files/XEOS-1.0-SNAPSHOT.jar Download]
+  * XEOS.jar - [http://umltoejb.googlecode.com/files/XEOS-1.0.jar Download]
   Obs.: This version is customized for this application. Please use this one.
 
 # Transformer-base
-  * transformer-base.jar - [http://umltoejb.googlecode.com/files/transformer-base-1.0-SNAPSHOT.jar Download]
+  * transformer-base-1.0.jar - [http://umltoejb.googlecode.com/files/transformer-base-1.0.jar Download]
 
-*Other files will be posted in a while. Just wait a little more :)*
+# Transformer
+  * transformer-1.0.jar - [http://umltoejb.googlecode.com/files/transformer-1.0.jar Download]
 
-==TO BE CONTINUED==
+*If you want the source-code, download the version 1.0 [http://umltoejb.googlecode.com/files/umltoejb-src-1.0.jar here] or [http://code.google.com/p/umltoejb/source/checkout checkout it]. We use [http://netbeans.org/ Netbeans] to develop this tool.*
+
+After this, you can use these files and test the transformer by yourself :)
+
+If you want to compile:
+
+1) Get the source code:
+1.1) Download it [http://umltoejb.googlecode.com/files/umltoejb-src-1.0.jar here]
+1.2) [http://code.google.com/p/umltoejb/source/checkout Checkout it here]
+
+2) Compile using:
+2.1) [http://netbeans.org/ Netbeans]. We use this IDE to develop this tool so we recommend it.
+2.2) [http://maven.apache.org/ Maven]. This project uses Maven so just run this command in the console: mvn compile
+2.3) javac. Use the following commands to compile (runit in the 'umltoejb' folder):
+{{{
+
+}}}
+
+3) Test it were you want. The next version (it is already in tests) will read a XMI to load the UML diagram but, for this version (1.0) you need to insert the diagram's elements hardcoded. To help you, see the folder 'interface-grafica'. In this project, it use some diagrams and it can help you building yours while the XMI version is in tests.  The project 'interface-grafica' allows you to query, using OCL, your models so enjoy :)
