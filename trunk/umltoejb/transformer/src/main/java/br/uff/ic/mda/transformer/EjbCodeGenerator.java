@@ -1,12 +1,12 @@
 package br.uff.ic.mda.transformer;
 
-import br.uff.ic.transformer.core.syntax.java.Attribute;
-import br.uff.ic.transformer.core.syntax.java.Class;
-import br.uff.ic.transformer.core.syntax.java.Constructor;
-import br.uff.ic.transformer.core.syntax.java.Interface;
-import br.uff.ic.transformer.core.syntax.java.Method;
-import br.uff.ic.transformer.core.syntax.java.Parameter;
-import br.uff.ic.transformer.core.syntax.java.JavaSyntax;
+import br.uff.ic.mda.transformer.core.syntax.java.Attribute;
+import br.uff.ic.mda.transformer.core.syntax.java.Class;
+import br.uff.ic.mda.transformer.core.syntax.java.Constructor;
+import br.uff.ic.mda.transformer.core.syntax.java.Interface;
+import br.uff.ic.mda.transformer.core.syntax.java.Method;
+import br.uff.ic.mda.transformer.core.syntax.java.Parameter;
+import br.uff.ic.mda.transformer.core.syntax.java.JavaSyntax;
 
 /**
  *
