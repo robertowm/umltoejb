@@ -1,4 +1,4 @@
-package br.uff.ic.transformer.core.syntax.java;
+package br.uff.ic.mda.transformer.core.syntax.java;
 
 /**
  *

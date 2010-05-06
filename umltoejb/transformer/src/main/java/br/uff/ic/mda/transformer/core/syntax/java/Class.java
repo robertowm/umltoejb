@@ -1,6 +1,6 @@
-package br.uff.ic.transformer.core.syntax.java;
+package br.uff.ic.mda.transformer.core.syntax.java;
 
-import br.uff.ic.transformer.core.util.XFile;
+import br.uff.ic.mda.transformer.core.util.XFile;
 import java.util.ArrayList;
 import java.util.List;
 

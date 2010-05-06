@@ -1,4 +1,4 @@
-package br.uff.ic.transformer.core.util;
+package br.uff.ic.mda.transformer.core.util;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
