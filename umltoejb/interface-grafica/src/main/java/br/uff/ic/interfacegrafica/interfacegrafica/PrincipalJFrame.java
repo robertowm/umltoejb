@@ -5,15 +5,26 @@
  */
 package br.uff.ic.interfacegrafica.interfacegrafica;
 
+import br.uff.mda.secumltoaac.parser.xmiparser.XMIParser;
+import br.uff.mda.secumltoaac.parser.xmiparser.uml.UMLAssociation;
+import br.uff.mda.secumltoaac.parser.xmiparser.uml.UMLAssociationEnd;
+import br.uff.mda.secumltoaac.parser.xmiparser.uml.UMLAttribute;
+import br.uff.mda.secumltoaac.parser.xmiparser.uml.UMLClass;
+import br.uff.mda.secumltoaac.parser.xmiparser.uml.UMLOperation;
 import br.uff.ic.mda.transformer.TransformationContract;
 import br.uff.ic.mda.transformer.EjbDomain;
 import br.uff.ic.mda.transformer.UmlDomain;
 import br.uff.ic.mda.transformer.UmlEjbDomain;
 import br.uff.ic.mda.transformer.EjbCodeGenerator;
 import br.uff.ic.mda.transformer.UmlEjbTransformer;
+import br.uff.mda.secumltoaac.parser.xmiparser.uml.UMLElement;
 import core.XEOS;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -76,60 +87,207 @@ public class PrincipalJFrame extends javax.swing.JFrame {
         aEjb.insertEJBAttribute("transportForm_A_ID", "transportForm", "private", "String", "Comestible_DC_ID");
     }
 
-    private void criarDiagramaObjetosUml() throws Exception {
-        aUml.insertClass("Customer_ID", "Customer");
-        aUml.insertClass("BreakfastOrder_ID", "BreakfastOrder");
-        aUml.insertClass("Breakfast_ID", "Breakfast");
-        aUml.insertClass("StandardBreakfast_ID", "StandardBreakfast");
-        aUml.insertClass("Comestible_ID", "Comestible");
-
-        aUml.insertAttribute("accountNumberC_ID", "accountNumberC", "public", "UMLInteger", "Customer_ID");
-        aUml.insertAttribute("addressC_ID", "addressC", "public", "UMLString", "Customer_ID");
-        aUml.insertAttribute("deliveryAddressBO_ID", "deliveryAddressBO", "public", "UMLString", "BreakfastOrder_ID");
-        aUml.insertAttribute("deliveryDateBO_ID", "deliveryDateBO", "public", "UMLDate", "BreakfastOrder_ID");
-        aUml.insertAttribute("deliveryTimeBO_ID", "deliveryTimeBO", "public", "UMLDate", "BreakfastOrder_ID");
-        aUml.insertAttribute("discountBO_ID", "discountBO", "public", "UMLDouble", "BreakfastOrder_ID");
-        aUml.insertAttribute("orderDateBO_ID", "orderDateBO", "public", "UMLDate", "BreakfastOrder_ID");
-        aUml.insertAttribute("numberB_ID", "numberB", "public", "UMLInteger", "Breakfast_ID");
-        aUml.insertAttribute("nameSB_ID", "nameSB", "public", "UMLString", "StandardBreakfast_ID");
-        aUml.insertAttribute("priceSB_ID", "priceSB", "public", "UMLReal", "StandardBreakfast_ID");
-        aUml.insertAttribute("styleSB_ID", "styleSB", "public", "UMLString", "StandardBreakfast_ID");
-        aUml.insertAttribute("nameCo_ID", "nameCo", "public", "UMLString", "Comestible_ID");
-        aUml.insertAttribute("minimalQuantityCo_ID", "minimalQuantityCo", "public", "UMLInteger", "Comestible_ID");
-        aUml.insertAttribute("priceComestibleCo_ID", "priceComestibleCo", "public", "UMLDouble", "Comestible_ID");
-        aUml.insertAttribute("transportFormCo_ID", "transportFormCo", "public", "UMLString", "Comestible_ID");
-
-        aUml.insertAssociationEnd("customerBO_ID", "customerBO", "public", "Customer_ID", "1", "1", false, "BreakfastOrder_ID");
-        aUml.insertAssociationEnd("ordersC_ID", "ordersC", "public", "BreakfastOrder_ID", "1", "*", false, "Customer_ID");
-        aUml.insertLinksBetweenAssociationEnds("ordersC_ID", "customerBO_ID");
-        aUml.insertAssociation("Customer_BreakfastOrder_ID", "Customer_BreakfastOrder", "customerBO_ID", "ordersC_ID");
-
-        aUml.insertAssociationEnd("orderB_ID", "orderB", "public", "BreakfastOrder_ID", "1", "1", true, "Breakfast_ID");
-        aUml.insertAssociationEnd("breakfastsBO_ID", "breakfastsBO", "public", "Breakfast_ID", "1", "*", false, "BreakfastOrder_ID");
-        aUml.insertLinksBetweenAssociationEnds("orderB_ID", "breakfastsBO_ID");
-        aUml.insertAssociation("BreakfastOrder_Breakfast_ID", "BreakfastOrder_Breakfast", "orderB_ID", "breakfastsBO_ID");
-
-        aUml.insertAssociationEnd("breakfastsSB_ID", "breakfastsSB", "public", "Breakfast_ID", "0", "*", false, "StandardBreakfast_ID");
-        aUml.insertAssociationEnd("standardB_ID", "standardB", "public", "StandardBreakfast_ID", "1", "1", false, "Breakfast_ID");
-        aUml.insertLinksBetweenAssociationEnds("breakfastsSB_ID", "standardB_ID");
-        aUml.insertAssociation("Breakfast_StandardBreakfast_ID", "Breakfast_StandardBreakfast", "breakfastsSB_ID", "standardB_ID");
-
+//    private void criarDiagramaObjetosUml() throws Exception {
+//        aUml.insertClass("Customer_ID", "Customer");
+//        aUml.insertClass("BreakfastOrder_ID", "BreakfastOrder");
+//        aUml.insertClass("Breakfast_ID", "Breakfast");
+//        aUml.insertClass("StandardBreakfast_ID", "StandardBreakfast");
+//        aUml.insertClass("Comestible_ID", "Comestible");
+//
+//        aUml.insertAttribute("accountNumberC_ID", "accountNumberC", "public", "Integer", "Customer_ID");
+//        aUml.insertAttribute("addressC_ID", "addressC", "public", "String", "Customer_ID");
+//        aUml.insertAttribute("deliveryAddressBO_ID", "deliveryAddressBO", "public", "String", "BreakfastOrder_ID");
+//        aUml.insertAttribute("deliveryDateBO_ID", "deliveryDateBO", "public", "Date", "BreakfastOrder_ID");
+//        aUml.insertAttribute("deliveryTimeBO_ID", "deliveryTimeBO", "public", "Date", "BreakfastOrder_ID");
+//        aUml.insertAttribute("discountBO_ID", "discountBO", "public", "Double", "BreakfastOrder_ID");
+//        aUml.insertAttribute("orderDateBO_ID", "orderDateBO", "public", "Date", "BreakfastOrder_ID");
+//        aUml.insertAttribute("numberB_ID", "numberB", "public", "Integer", "Breakfast_ID");
+//        aUml.insertAttribute("nameSB_ID", "nameSB", "public", "String", "StandardBreakfast_ID");
+//        aUml.insertAttribute("priceSB_ID", "priceSB", "public", "Real", "StandardBreakfast_ID");
+//        aUml.insertAttribute("styleSB_ID", "styleSB", "public", "String", "StandardBreakfast_ID");
+//        aUml.insertAttribute("nameCo_ID", "nameCo", "public", "String", "Comestible_ID");
+//        aUml.insertAttribute("minimalQuantityCo_ID", "minimalQuantityCo", "public", "Integer", "Comestible_ID");
+//        aUml.insertAttribute("priceComestibleCo_ID", "priceComestibleCo", "public", "Double", "Comestible_ID");
+//        aUml.insertAttribute("transportFormCo_ID", "transportFormCo", "public", "String", "Comestible_ID");
+//
+//        aUml.insertAssociationEnd("customerBO_ID", "customerBO", "public", "Customer_ID", "1", "1", false, "BreakfastOrder_ID");
+//        aUml.insertAssociationEnd("ordersC_ID", "ordersC", "public", "BreakfastOrder_ID", "1", "*", false, "Customer_ID");
+//        aUml.insertLinksBetweenAssociationEnds("ordersC_ID", "customerBO_ID");
+//        aUml.insertAssociation("Customer_BreakfastOrder_ID", "Customer_BreakfastOrder", "customerBO_ID", "ordersC_ID");
+//
+//        aUml.insertAssociationEnd("orderB_ID", "orderB", "public", "BreakfastOrder_ID", "1", "1", true, "Breakfast_ID");
+//        aUml.insertAssociationEnd("breakfastsBO_ID", "breakfastsBO", "public", "Breakfast_ID", "1", "*", false, "BreakfastOrder_ID");
+//        aUml.insertLinksBetweenAssociationEnds("orderB_ID", "breakfastsBO_ID");
+//        aUml.insertAssociation("BreakfastOrder_Breakfast_ID", "BreakfastOrder_Breakfast", "orderB_ID", "breakfastsBO_ID");
+//
+//        aUml.insertAssociationEnd("breakfastsSB_ID", "breakfastsSB", "public", "Breakfast_ID", "0", "*", false, "StandardBreakfast_ID");
+//        aUml.insertAssociationEnd("standardB_ID", "standardB", "public", "StandardBreakfast_ID", "1", "1", false, "Breakfast_ID");
+//        aUml.insertLinksBetweenAssociationEnds("breakfastsSB_ID", "standardB_ID");
+//        aUml.insertAssociation("Breakfast_StandardBreakfast_ID", "Breakfast_StandardBreakfast", "breakfastsSB_ID", "standardB_ID");
+//
 //        aUml.insertAssociationEnd("standardsC_ID", "standardsC", "public", "StandardBreakfast_ID", "0", "*", false, "Comestible_ID");
-        aUml.insertAssociationEnd("comestibleSB_ID", "comestibleSB", "public", "Comestible_ID", "1", "*", false, "StandardBreakfast_ID");
+//        aUml.insertAssociationEnd("comestibleSB_ID", "comestibleSB", "public", "Comestible_ID", "1", "*", false, "StandardBreakfast_ID");
 //        aUml.insertLinksBetweenAssociationEnds("standardsC_ID", "comestibleSB_ID");
 //        aUml.insertAssociationClass("PartClass_ID", "PartClass", "standardsC_ID", "comestibleSB_ID");
-        aUml.insertAssociationClass("PartClass_ID", "PartClass", "comestibleSB_ID");
-        aUml.insertAttribute("quantityPC_ID", "quantityPC", "public", "UMLInteger", "PartClass_ID");
-
+//        aUml.insertAttribute("quantityPC_ID", "quantityPC", "public", "Integer", "PartClass_ID");
+//
 //        aUml.insertAssociationEnd("breakfastsC_ID", "breakfastsC", "public", "Breakfast_ID", "0", "*", false, "Comestible_ID");
-        aUml.insertAssociationEnd("comestibleItemB_ID", "comestibleItemB", "public", "Comestible_ID", "0", "*", false, "Breakfast_ID");
+//        aUml.insertAssociationEnd("comestibleItemB_ID", "comestibleItemB", "public", "Comestible_ID", "0", "*", false, "Breakfast_ID");
 //        aUml.insertLinksBetweenAssociationEnds("breakfastsC_ID", "comestibleItemB_ID");
 //        aUml.insertAssociationClass("ChangeClass_ID", "ChangeClass", "breakfastsC_ID", "comestibleItemB_ID");
-        aUml.insertAssociationClass("ChangeClass_ID", "ChangeClass", "comestibleItemB_ID");
-        aUml.insertAttribute("quantityCC_ID", "quantityCC", "public", "UMLInteger", "ChangeClass_ID");
+//        aUml.insertAttribute("quantityCC_ID", "quantityCC", "public", "Integer", "ChangeClass_ID");
+//
+//        aUml.insertOperation("createOrder_ID", "createOrder", "public", "Boolean", "Customer_ID");
+//        aUml.insertOperation("calculatePrice_ID", "calculatePrice", "public", "Double", "BreakfastOrder_ID");
+//    }
+    private void criarDiagramaObjetosUml() throws Exception {
 
-        aUml.insertOperation("createOrder_ID", "createOrder", "public", "UMLBoolean", "Customer_ID");
-        aUml.insertOperation("calculatePrice_ID", "calculatePrice", "public", "UMLDouble", "BreakfastOrder_ID");
+
+        XMIParser parser = new XMIParser("/home/edson/Desktop/UMLtoEJB/DiagramaExemplo.xmi");
+
+
+        parser.parse();
+        Set<Entry<String, UMLClass>> classSet = parser.getClasses().entrySet();
+        Set<Entry<String, UMLAttribute>> attributeSet = parser.getAttributes().entrySet();
+
+
+
+
+
+        //Inserting classes
+
+
+        for (Entry<String, UMLClass> classEntry : classSet) {
+
+
+            aUml.insertClass(processID(classEntry.getValue().getId()), classEntry.getValue().getName());
+        }
+
+       
+
+
+
+
+
+
+        //Inserting attributes
+
+        for (Entry<String, UMLClass> classEntry : classSet) {
+            ArrayList<UMLAttribute> attributeArray = classEntry.getValue().getAttributes();
+            for (UMLAttribute attribute : attributeArray) {
+                String attributeTypeID = null;
+                String attributeTypeName = null;
+                String attributeType = null;
+                if (parser.getDataTypes().containsKey(attribute.getType())) {
+                    attributeTypeID = parser.getDataTypes().get(attribute.getType()).getId();
+                    attributeTypeName = parser.getDataTypes().get(attributeTypeID).getName();
+                    if ("String".equals(attributeTypeName)) {
+                        attributeType = "UML" + attributeTypeName;
+                    } else {
+                        attributeType = parser.getDataTypes().get(attributeTypeID).getId();
+                    }
+                } else {
+                    throw new Exception("Attribute (" + attribute.getType() + ") type not found in class" + classEntry.getValue().getName() + " " + classEntry.getValue().getId());
+                }
+
+                aUml.insertAttribute(processID(attribute.getId()), attribute.getName(), attribute.getVisibility(), attributeType, processID(classEntry.getValue().getId()));
+            }
+
+        }
+
+
+
+        //Inserting Association End
+        processAssociations(parser);
+
+        //Inserting Methods
+
+        for (Entry<String, UMLClass> classeEntry : classSet) {
+
+            ArrayList<UMLOperation> operationArray = classeEntry.getValue().getOperations();
+            for (UMLOperation operation : operationArray) {
+                System.out.println("Tipo da operacao: " + operation.getType() + " nome: " + parser.getDataTypes().get(operation.getType()).getName());
+                String operationType = parser.getDataTypes().get(operation.getType()).getName();
+                if ("String".equals(operationType) || "Boolean".equals(operationType)) {
+                    operationType = "UML" + operationType;
+                } else if ("List".equals(operationType)) {
+                    String setId= "ID"+System.nanoTime();
+                    aUml.insertSet(setId, operationType, processID(classeEntry.getValue().getId()));
+                    aUml.insertOperation(processID(operation.getId()), operation.getName(), operation.getVisibility(), setId, processID(classeEntry.getValue().getId()));
+                    return ;
+
+                }else {
+                    operationType = processID(operation.getType());
+//                    operationType = operationType.replaceAll("\\.", "");
+                }
+                aUml.insertOperation(processID(operation.getId()), operation.getName(), operation.getVisibility(), operationType, processID(classeEntry.getValue().getId()));
+            }
+        }
+
+
+
+    }
+
+    private void processAssociations(XMIParser parser) throws Exception {
+        Set<Entry<String, UMLAssociation>> associationSet = parser.getAssociationMap().entrySet();
+
+        for (Entry<String, UMLAssociation> associationEntry : associationSet) {
+
+            HashMap<String, UMLAssociationEnd> associationEndMap = associationEntry.getValue().getAssociationEndMap();
+
+            if (associationEndMap.size() != 2) {
+                throw new Exception("Error in associations end size for " + associationEntry.getValue().getId() + " association");
+            }
+
+            Set<Entry<String, UMLAssociationEnd>> associationEndSet = associationEndMap.entrySet();
+
+            ArrayList<UMLAssociationEnd> associationEndArray = new ArrayList<UMLAssociationEnd>();
+
+            for (Entry<String, UMLAssociationEnd> associationEnd : associationEndSet) {
+
+                associationEndArray.add(associationEnd.getValue());
+
+            }
+
+            UMLAssociationEnd association2 = associationEndArray.get(0);
+            UMLAssociationEnd association1 = associationEndArray.get(1);
+
+
+            UMLClass class1 = parser.getClasses().get(association1.getParticipantClassId());
+            UMLClass class2 = parser.getClasses().get(association2.getParticipantClassId());
+
+
+
+            aUml.insertAssociationEnd(processID(association2.getId()), association2.getName(), association2.getVisibility(), processID(class2.getId()), String.valueOf(association2.getLower()), String.valueOf(association2.getUpper()), association2.isAggregation(), processID(class1.getId()));//Class Id ??
+
+            aUml.insertAssociationEnd(processID(association1.getId()), association1.getName(), association1.getVisibility(), processID(class1.getId()), String.valueOf(association1.getLower()), String.valueOf(association1.getUpper()), association1.isAggregation(), processID(class2.getId()));
+
+            aUml.insertLinksBetweenAssociationEnds(processID(association2.getId()), processID(association1.getId()));
+
+            aUml.insertAssociation(processID(associationEntry.getValue().getId()), associationEntry.getValue().getName(), processID(association2.getId()), processID(association1.getId()));
+
+
+
+        }
+
+    }
+
+    /**
+     * @deprecated
+     * @param oldID
+     * @return
+     */
+    private String processID(String oldID) {
+
+        String newID = "ID";
+        newID = newID.concat(oldID);
+        newID = newID.replace("\\.", "");
+        newID = newID.replace(":", "");
+        newID = newID.replace("-", "");
+        newID = newID.replace(" ", "");
+
+        return newID;
+
     }
 
     private void criarDiagramaUmlArtigo() throws Exception {
@@ -224,8 +382,9 @@ public class PrincipalJFrame extends javax.swing.JFrame {
         aEjb.createSpecificationOfCurrentDiagram();
         aJuncao.createSpecificationOfCurrentDiagram();
 
-//        criarDiagramaObjetosUml();
-        criarDiagramaUmlArtigo();
+        criarDiagramaObjetosUml();
+//        criarDiagramaUmlArtigo();
+
 
         TransformationContract ct = new TransformationContract(aUml, aEjb, aJuncao, new UmlEjbTransformer(aUml, aEjb, aJuncao), new EjbCodeGenerator(aEjb, ""));
         ct.transform();
@@ -305,11 +464,11 @@ public class PrincipalJFrame extends javax.swing.JFrame {
             }
         });
 
-        jLabel3.setText("Instituto de Computação - UFF");
+        jLabel3.setText("Instituto de ComputaÔøΩÔøΩo - UFF");
 
-        jLabel4.setText("Disciplina: Modelagem e Validação");
+        jLabel4.setText("Disciplina: Modelagem e ValidaÔøΩÔøΩo");
 
-        jLabel5.setText("Sistema de queries em relação ao meta-modelo UML com o diagrama apresentado no livro MDA Explained");
+        jLabel5.setText("Sistema de queries em relaÔøΩÔøΩo ao meta-modelo UML com o diagrama apresentado no livro MDA Explained");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
