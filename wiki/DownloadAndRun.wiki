@@ -5,8 +5,25 @@
 
 In this page we describe how to run our tool, the transformer, and documents for a better understanding.
 
+= Test our transformer =
 
-= Download and Run =
+We develop 3 applications that use our tool.
+
+*1) SimpleCommandLine:*
+  * [http://umltoejb.googlecode.com/files/SimpleCommandLine-1.0-SNAPSHOT-jar-with-dependencies.jar Download here].
+  * Run to transform our diagram's example ([http://code.google.com/p/umltoejb/wiki/ViewAnExample see here]) hardcoded in this app.
+
+*2) XMICommandLine:*
+  * [http://umltoejb.googlecode.com/files/XMICommandLine-1.0-SNAPSHOT-jar-with-dependencies.jar Download here].
+  * Transform XMI files in your Terminal using 'java -jar XMICommandLine.jar path_to_xmi'.
+
+*3) XMIGui:*
+  * [http://umltoejb.googlecode.com/files/XMIGui-1.0-SNAPSHOT.jar Download here].
+  * Using our GUI, you can load XMI files to transform them and query the result using OCL queries.
+
+== This app's source code is in out repository. If you want, it's in the folder 'apps'==
+
+= Download our project compiled =
 
 First, you have to download the dependencies:
 
@@ -28,9 +45,9 @@ First, you have to download the dependencies:
 _*If you want the source-code, download the version 1.0 [http://umltoejb.googlecode.com/files/umltoejb-src-1.0.jar here] or [http://code.google.com/p/umltoejb/source/checkout checkout it]. We use [http://netbeans.org/ Netbeans] to develop this tool.*_
 `*``*``*`
 
-After this, you can use these files and test the transformer by yourself :)
+After this, you can use these files and test the transformer by yourself, in your own application :)
 
-= Download, Compile and Run =
+= Download and Compile =
 
 If you want to compile this project:
 
@@ -43,11 +60,8 @@ If you want to compile this project:
   * [http://maven.apache.org/ Maven]. This project uses Maven so just run this command in the console: mvn compile
   * javac. Use the following commands to compile (run it in the 'umltoejb' folder) (In this case, YOU MUST DOWNLOAD ALL SLF4J DEPENDENCIES and put these jar in the 'umltoejb' folder):
     {{{
-            Under contruction.
+            Under construction.
     }}}
-
-*3) Test it were you want!* 
-The next version (it is already in tests) will read a XMI to load the UML diagram but, for this version (1.0) you need to insert the diagram's elements hardcoded. To help you, see the folder 'interface-grafica'. In this project, it use some diagrams and it can help you building yours while the XMI version is in tests.  The project 'interface-grafica' allows you to query, using OCL, your models so enjoy :)
 
 = Javadoc =
 
