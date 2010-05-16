@@ -25,6 +25,7 @@ We develop 3 applications that use our tool.
   * To run it, just double click on the .jar or use the command line 'java -jar jar_name'. All the necessary dependencies is already included in the .jar.
 
 == This app's source code is in out repository. If you want, it's in the folder 'apps'==
+== If you need a XMI to test, [http://umltoejb.googlecode.com/files/BlogExample.xmi download here].
 
 = Download our project compiled =
 
