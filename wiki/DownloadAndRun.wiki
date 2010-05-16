@@ -12,14 +12,17 @@ We develop 3 applications that use our tool.
 *1) SimpleCommandLine:*
   * [http://umltoejb.googlecode.com/files/SimpleCommandLine-1.0-SNAPSHOT-jar-with-dependencies.jar Download here].
   * Run to transform our diagram's example ([http://code.google.com/p/umltoejb/wiki/ViewAnExample see here]) hardcoded in this app.
+  * To run it, just double click on the .jar or use the command line 'java -jar jar_name'. All the necessary dependencies is already included in the .jar.
 
 *2) XMICommandLine:*
   * [http://umltoejb.googlecode.com/files/XMICommandLine-1.0-SNAPSHOT-jar-with-dependencies.jar Download here].
   * Transform XMI files in your Terminal using 'java -jar XMICommandLine.jar path_to_xmi'.
+  * To run it, use the command line 'java -jar jar_name'. All the necessary dependencies is already included in the .jar.
 
 *3) XMIGui:*
   * [http://umltoejb.googlecode.com/files/XMIGui-1.0-SNAPSHOT.jar Download here].
   * Using our GUI, you can load XMI files to transform them and query the result using OCL queries.
+  * To run it, just double click on the .jar or use the command line 'java -jar jar_name'. All the necessary dependencies is already included in the .jar.
 
 == This app's source code is in out repository. If you want, it's in the folder 'apps'==
 
