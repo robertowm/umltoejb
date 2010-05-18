@@ -20,7 +20,7 @@ We develop 3 applications that use our tool.
   * To run it, use the command line 'java -jar jar_name'. All the necessary dependencies is already included in the .jar.
 
 *3) XMIGui:*
-  * [http://umltoejb.googlecode.com/files/XMIGui-1.0-SNAPSHOT.jar Download here].
+  * [http://umltoejb.googlecode.com/files/XMIGui-1.0-SNAPSHOT-jar-with-dependencies.jar Download here].
   * Using our GUI, you can load XMI files to transform them and query the result using OCL queries.
   * To run it, just double click on the .jar or use the command line 'java -jar jar_name'. All the necessary dependencies is already included in the .jar.
 
