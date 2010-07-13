@@ -34,6 +34,10 @@ public class UmlDomain extends Domain {
     public void insertMetamodelInvariants() throws Exception {
         logger.debug("Inserting Uml MetaModel Invariants");
 
+        // AssociationEnd`s devem ter nomes únicos em uma associação.
+        this.insertInvariant("associationEndsNamesAreUniqueInAnAssociation",
+                "Association.allInstances()->forAll( a : Association | a.associationEnds->forAll( ae1, ae2 : AssociationEnd | ae1.name = ae2.name implies ae1 = ae2))");
+
         // Classes associativas nao podem ter um AssociationEnd vinculado a ela (devido a ser uma Association) que possua composition = true
         this.insertInvariant("notExistsCompositionAssociationEndAssignedToAssociationClass",
                 "AssociationClass.allInstances()->forAll(ac : AssociationClass | ac.associationEnds->forAll(ae : AssociationEnd | ae.composition = false))");
