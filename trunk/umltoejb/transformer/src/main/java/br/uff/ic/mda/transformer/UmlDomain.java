@@ -34,10 +34,6 @@ public class UmlDomain extends Domain {
     public void insertMetamodelInvariants() throws Exception {
         logger.debug("Inserting Uml MetaModel Invariants");
 
-        // AssociationEnd`s devem ter nomes únicos em uma associação.
-        this.insertInvariant("associationEndsNamesAreUniqueInAnAssociation",
-                "Association.allInstances()->forAll( a : Association | a.associationEnds->forAll( ae1, ae2 : AssociationEnd | ae1.name = ae2.name implies ae1 = ae2))");
-
         // Classes associativas nao podem ter um AssociationEnd vinculado a ela (devido a ser uma Association) que possua composition = true
         this.insertInvariant("notExistsCompositionAssociationEndAssignedToAssociationClass",
                 "AssociationClass.allInstances()->forAll(ac : AssociationClass | ac.associationEnds->forAll(ae : AssociationEnd | ae.composition = false))");
@@ -76,6 +72,32 @@ public class UmlDomain extends Domain {
         // Nao pode ter ciclos na hierarquia de heranca de classes
         this.insertInvariant("noCyclesinClassHierarchy",
                 "Class.allInstances()->excluding(NULL_CLASS)->forAll(c : Class | c.inheritsFrom->forAll(r : Class | r.superPlus()->excludes(c)))");
+
+        // ********** Novos invariantes **********
+        // AssociationEnd's devem ter nomes unicos em uma associacao.
+        this.insertInvariant("associationEndsNamesAreUniqueInAnAssociation",
+                "Association.allInstances()->forAll( a : Association | a.associationEnds->forAll( ae1, ae2 : AssociationEnd | ae1.name = ae2.name implies ae1 = ae2))");
+
+        // N‹o pode ter Operations em uma mesma Class com mesmo nome
+//        this.insertInvariant("onlyOneOperationNameperClass", "Class.allInstances()->forAll(c:Class | c.feature->select(f:Feature | f.oclIsTypeOf(Operation))->forAll(a | c.feature->select(f|f.oclIsTypeOf(Operation))->size() - 1 = c.feature->select(f|f.oclIsTypeOf(Operation))->excluding(a)->size()))");
+        // versao baseada na antiga: Class.allInstances()->forAll(c:Class |c.feature->select(f|f.oclIsTypeOf(Operation))->collect(f|f.oclAsType(Operation))->forAll(a| c.feature->select(f|f.oclIsTypeOf(Operation))->select(f| f.name = a.name and f.oclAsType(Operation).parameter->forAll(p|a.oclAsType(Operation).parameter->includes(p)))->size() - 1 = c.feature->select(f|f.oclIsTypeOf(Operation))->select(f|f.name = a.name and f.oclAsType(Operation).parameter->forAll(p:Parameter | a.oclAsType(Operation).parameter->includes(p)))->excluding(a)->size()))
+        this.insertInvariant("onlyOneOperationNameperClass", "Class.allInstances()->forAll(c:Class |c.feature->select(f|f.oclIsTypeOf(Operation))->collect(f|f.oclAsType(Operation))->forAll(a| c.feature->select(f|f.oclIsTypeOf(Operation))->select(f| f.name = a.name and f.oclAsType(Operation).parameter->size() = a.oclAsType(Operation).parameter->size() and f.oclAsType(Operation).parameter->forAll(p|a.oclAsType(Operation).parameter->includes(p)))->size() = 1))");
+
+        // N‹o pode ter Attribute e AssociationEnd em uma mesma Class com mesmo nome
+//        this.insertInvariant("onlyOneAttrOrAsscEndNameperClass", "Class.allInstances()->forAll(c:Class | c.feature->select(f|f.oclIsTypeOf(Attribute) or f.oclIsKindOf(AssociationEnd))->forAll(a | c.feature->select(f|f.oclIsTypeOf(Attribute) or f.oclIsKindOf(AssociationEnd))->size() - 1 = c.feature->select(f|f.oclIsTypeOf(Attribute) or f.oclIsKindOf(AssociationEnd))->excluding(a)->size()))");
+        this.insertInvariant("onlyOneAttrOrAsscEndNameperClass", "Class.allInstances()->forAll(c:Class | c.feature->select(f|f.oclIsTypeOf(Attribute) or f.oclIsKindOf(AssociationEnd))->forAll(a | c.feature->select(f|f.oclIsTypeOf(Attribute) or f.oclIsKindOf(AssociationEnd))->select(f|f.name = a.name)->size() = 1))");
+
+        // Nao eh permitido getters e setters
+        this.insertInvariant("prohibitedGettersandSetters", "Class.allInstances()->forAll(c | c.feature->select(f | f.oclIsTypeOf(Operation))->collect(f | f.oclAsType(Operation))->forAll(op | c.feature->select(f | f.oclIsTypeOf(Attribute))->forAll(f | 'get'.concat(f.name).toLower() <> c.name.toLower() and 'set'.concat(f.name).toLower() <> c.name.toLower())))");
+
+        // Apenas associacoes binarias podem ser composi›es p. 112 Infra
+        this.insertInvariant("limitCompositeAssociationSize", "Association.allInstances()->forAll(a | if a.associationEnds->exists(ae | ae.composition = true) then a.associationEnds->size() = 2 else true endif)");
+
+        // A multiplicity of a composite aggregation must not have an upper bound greater than 1. p. 125 Infra
+        this.insertInvariant("compositeMultiplicityRestriction", "AssociationEnd.allInstances()->forAll(ae | if ae.composition = true then ae.upper = '1' or ae.upper.size() = 0 else true endif)");
+
+        
+
 
     }
 
@@ -275,6 +297,7 @@ public class UmlDomain extends Domain {
     }
 
     @Override
+    // Corrigir os nomes das associacoes para = ao Metamodelo
     public void insertMetamodelAssociations() throws Exception {
         this.ieos.insertAssociation("AssociationEnd", "otherEnd", "0..1", "0..*", "others", "AssociationEnd");
         this.ieos.insertAssociation("AssociationEnd", "associationEnds", "1..*", "1", "association", "Association");
