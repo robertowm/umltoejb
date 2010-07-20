@@ -59,7 +59,7 @@ public class EjbCodeGenerator extends CodeGenerator<EjbDomain> {
                 String idClass = id.replace("'", "").trim();
 
                 Class keyClass = JavaSyntax.getJavaClass();
-                keyClass.setDirectoryPath("codigo_gerado/");
+                keyClass.setDirectoryPath("generated_code/");
                 keyClass.setPackagePath("app");
 
                 query = idClass + ".name";
@@ -143,7 +143,7 @@ public class EjbCodeGenerator extends CodeGenerator<EjbDomain> {
             try {
             // Criando o EJBObject
                 Interface ejbObject = JavaSyntax.getJavaInterface();
-                ejbObject.setDirectoryPath("codigo_gerado/");
+                ejbObject.setDirectoryPath("generated_code/");
                 ejbObject.setPackagePath("app");
 
                 ejbObject.addImportPath("java.rmi.*");
@@ -184,7 +184,7 @@ public class EjbCodeGenerator extends CodeGenerator<EjbDomain> {
             // Criando o EJBHome
 
                 Interface ejbHome = JavaSyntax.getJavaInterface();
-                ejbHome.setDirectoryPath("codigo_gerado/");
+                ejbHome.setDirectoryPath("generated_code/");
                 ejbHome.setPackagePath("app");
 
                 ejbHome.addImportPath("java.rmi.*");
@@ -252,7 +252,7 @@ public class EjbCodeGenerator extends CodeGenerator<EjbDomain> {
 
             // Criar o EntityBean correspondente
                 Class entityBean = JavaSyntax.getJavaClass();
-                entityBean.setDirectoryPath("codigo_gerado/");
+                entityBean.setDirectoryPath("generated_code/");
                 entityBean.setPackagePath("app");
 
 //                classe.addImport("java.rmi.*");
@@ -367,7 +367,7 @@ public class EjbCodeGenerator extends CodeGenerator<EjbDomain> {
             try {
 
                 Class dataClass = JavaSyntax.getJavaClass();
-                dataClass.setDirectoryPath("codigo_gerado/");
+                dataClass.setDirectoryPath("generated_code/");
                 dataClass.setPackagePath("app");
                 
                 dataClass.addImportPath("java.util.*");

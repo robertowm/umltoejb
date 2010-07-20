@@ -77,7 +77,7 @@ public class EjbDomain extends Domain {
 
     @Override
     public void insertMetamodelInvariants() throws Exception {
-        // Todo EJBServingAttribute pertence a um EJBEntityComponent (VALIDAR)
+        // Todo EJBServingAttribute pertence a um EJBEntityComponent
         this.insertInvariant("everyEJBServingAttributebelongstoEJBEntityComponent", "EJBServingAttribute.allInstances()->collect(sa : EJBServingAttribute | sa.class)->forAll(c : EJBClass | c.oclIsKindOf(EJBEntityComponent))");
 
         // Toda EJBDataSchemaElement precisa ter um EJBDataSchema
@@ -106,6 +106,31 @@ public class EjbDomain extends Domain {
 
         // Todo EJBSet precisa ter um tipo
         this.insertInvariant("everyEJBSetmusthaveatype", "EJBSet.allInstances()->forAll(s : EJBSet | s.elementType <> NULL_EJBC)");
+
+        // ********** Novos invariantes **********
+        // Todo metodo que comea com 'remove' tem que ser um remove method
+        this.insertInvariant("prefixRemovemustbeaRemoveMethod", "BusinessMethod.allInstances()->forAll(bm | if bm.name.size() >= 6 then (if bm.name.substring(1, 6) = 'remove' then bm.isRemoveMethod() else true endif) else true endif)");
+
+        // Todo metodo que comea com 'create' tem que ser um create method
+        this.insertInvariant("prefixCreatemustbeaCreateMethod", "BusinessMethod.allInstances()->forAll(bm | if bm.name.size() >= 6 then (if bm.name.substring(1, 6) = 'create' then bm.isCreateMethod() else true endif) else true endif)");
+
+        // Todo metodo que comea com 'find' tem que ser um finder method
+        this.insertInvariant("prefixFindmustbeaFinderMethod", "BusinessMethod.allInstances()->forAll(bm | if bm.name.size() >= 4 then (if bm.name.substring(1, 4) = 'find' then bm.isFinderMethod() else true endif) else true endif)");
+
+        // Nenhum metodo pode comear com 'ejb'
+        this.insertInvariant("prefixEjbisforbidden", "BusinessMethod.allInstances()->forAll(bm | if bm.name.size() >= 3 then bm.name.substring(1, 3) <> 'ejb' else true endif)");
+
+        // Todos os metodos precisar ser Remove, Create, Finder ou Home methods.
+        this.insertInvariant("allowedTypesofMethods", "BusinessMethod.allInstances()->forAll(bm | bm.isRemoveMethod() or bm.isFinderMethod() or bm.isCreateMethod() or bm.isHomeMethod() or bm.name = 'null')");
+
+        // N‹o pode ter BusinessMethods em uma mesma EJBClass com mesmo nome
+//        this.insertInvariant("onlyOneBusinessMethodNameperEJBClass", "EJBClass.allInstances()->forAll(c:EJBClass | c.feature->select(f:EJBFeature | f.oclIsTypeOf(BusinessMethod))->forAll(a | c.feature->select(f|f.oclIsTypeOf(BusinessMethod))->size() - 1 = c.feature->select(f|f.oclIsTypeOf(BusinessMethod))->excluding(a)->size()))");
+        this.insertInvariant("onlyOneBusinessMethodNameperEJBClass", "EJBClass.allInstances()->forAll(c:EJBClass |c.feature->select(f|f.oclIsTypeOf(BusinessMethod))->collect(f|f.oclAsType(BusinessMethod))->forAll(a| c.feature->select(f|f.oclIsTypeOf(BusinessMethod))->select(f| f.name = a.name and f.oclAsType(BusinessMethod).parameter->size() = a.oclAsType(BusinessMethod).parameter->size() and f.oclAsType(BusinessMethod).parameter->forAll(p|a.oclAsType(BusinessMethod).parameter->includes(p)))->size() = 1))");
+
+        // N‹o pode ter EJBAttribute e EJBAssociationEnd em uma mesma EJBClass com mesmo nome
+//        this.insertInvariant("onlyOneAttrOrAsscEndNameperEJBClass", "EJBClass.allInstances()->forAll(c:EJBClass | c.feature->select(f|f.oclIsTypeOf(EJBAttribute) or f.oclIsKindOf(EJBAssociationEnd))->forAll(a | c.feature->select(f|f.oclIsTypeOf(EJBAttribute) or f.oclIsKindOf(EJBAssociationEnd))->size() - 1 = c.feature->select(f|f.oclIsTypeOf(EJBAttribute) or f.oclIsKindOf(EJBAssociationEnd))->excluding(a)->size()))");
+        this.insertInvariant("onlyOneAttrOrAsscEndNameperEJBClass", "EJBClass.allInstances()->forAll(c:EJBClass | c.feature->select(f|f.oclIsTypeOf(EJBAttribute) or f.oclIsKindOf(EJBAssociationEnd))->forAll(a | c.feature->select(f|f.oclIsTypeOf(EJBAttribute) or f.oclIsKindOf(EJBAssociationEnd))->select(f|f.name = a.name)->size() = 1))");
+      
     }
 
     @Override
@@ -116,8 +141,22 @@ public class EjbDomain extends Domain {
         Object[] params;
         String[] param;
 
+        // isCreateMethod -> verifica se um mŽtodo Ž um Create Method
+        // *** verifica apenas o nome pois o retorno n‹o Ž poss’vel de saber com base na abstra‹o do metamodelo ***
+        result &= ieos.insertOperation("BusinessMethod", "isCreateMethod", "Boolean", "if self.name.size() >= 6 then self.name.substring(1, 6) = 'create' and self.type->forAll(a | if a.oclIsTypeOf(EJBDataClass) then true else (if a.oclIsTypeOf(EJBSet) then a.oclAsType(EJBSet).elementType.oclIsTypeOf(EJBDataClass) else false endif) endif ) else false endif", new Object[0]);
+
+        // isFinderMethod -> verifica se um mŽtodo Ž um Finder Method
+        // *** verifica apenas o nome pois o retorno n‹o Ž poss’vel de saber com base na abstra‹o do metamodelo ***
+        result &= ieos.insertOperation("BusinessMethod", "isFinderMethod", "Boolean", "if self.name.size() >= 4 then self.name.substring(1, 4) = 'find' and self.type->forAll(a | if a.oclIsTypeOf(EJBDataClass) then true else (if a.oclIsTypeOf(EJBSet) then a.oclAsType(EJBSet).elementType.oclIsTypeOf(EJBDataClass) else false endif) endif ) else false endif", new Object[0]);
+
+        // isRemoveMethod -> verifica se um mŽtodo Ž um Remove Method
+        result &= ieos.insertOperation("BusinessMethod", "isRemoveMethod", "Boolean", "if self.name.size() >= 6 then self.name.substring(1, 6) = 'remove' and self.type->forAll(a | a.name = 'null') and self.parameter->notEmpty() else false endif", new Object[0]);
+
+        // isHomeMethod -> verifica se um mŽtodo Ž um Home Method
+        result &= ieos.insertOperation("BusinessMethod", "isHomeMethod", "Boolean", "if self.name.size() >= 6 then self.name.substring(1, 6) <> 'remove' and self.name.substring(1, 6) <> 'create' else true endif and if self.name.size() >= 4 then self.name.substring(1,4) <> 'find' else true endif and self.parameter.type->forAll(p | if p.oclIsTypeOf(EJBDataType) then true else (if p.oclIsTypeOf(EJBSet) then p.oclAsType(EJBSet).elementType.oclIsTypeOf(EJBDataType) else false endif) endif)", new Object[0]);
+
         if (!result) {
-            throw new Exception("It was not possible to insert all the operations in the SecureUML model");
+            throw new Exception("It was not possible to insert all the operations in the EJB model");
         }
 
         return result;
@@ -126,10 +165,15 @@ public class EjbDomain extends Domain {
     @Override
     public void createSpecificationOfCurrentDiagram() throws Exception {
         this.ieos.insertObject("EJBDataSchemaElement", "NULL_EJBDSE");
+        this.ieos.insertValue("EJBDataSchemaElement", "name", "NULL_EJBDSE", "null");
         this.ieos.insertObject("EJBDataSchema", "NULL_EJBDS");
+        this.ieos.insertValue("EJBDataSchema", "name", "NULL_EJBDS", "null");
         this.ieos.insertObject("EJBClassifier", "NULL_EJBC");
+        this.ieos.insertValue("EJBClassifier", "name", "NULL_EJBC", "null");
         this.ieos.insertObject("EJBTyped", "NULL_EJBT");
+        this.ieos.insertValue("EJBTyped", "name", "NULL_EJBT", "null");
         this.ieos.insertObject("BusinessMethod", "NULL_BM");
+        this.ieos.insertValue("BusinessMethod", "name", "NULL_BM", "null");
 
         this.ieos.insertObject("EJBDataType", "EJBInteger");
         this.ieos.insertValue("EJBDataType", "name", "EJBInteger", "Integer");

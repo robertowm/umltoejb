@@ -18,16 +18,42 @@ public class UmlEjbDomain extends Domain {
 
         // Todo DataType precisa de um correspondente EJBDataType
         this.insertInvariant("everyDataClassMustHaveEJBDataType", "DataType.allInstances()->select(dt : DataType | dt.oclIsTypeOf(DataType))->forAll(dt : DataType | dt.transformerToEjbDataType->notEmpty())");
-        // Todo UMLSet precisa de um correspondente EJBSet
-        this.insertInvariant("everyUmlSetMustHaveEjbSet", "UMLSet.allInstances()->forAll(s : UMLSet | s.transformerToSet->notEmpty())");
-        // Toda Class e AssociationClass precisa de uma EJBKeyClass
-        this.insertInvariant("everyClassMustHaveEJBKeyClass", "Class.allInstances()->excluding(NULL_CLASS)->forAll(c : Class | c.transformerToClass->notEmpty())");
-        this.insertInvariant("everyAssociationClassMustHaveEJBKeyClass", "AssociationClass.allInstances()->forAll(ac : AssociationClass | ac.transformerToAssociationClass->notEmpty())");
-        // Toda Class e AssociationClass precisa de uma EJBDataClass
-        this.insertInvariant("everyClassMustHaveEJBDataClass", "Class.allInstances()->excluding(NULL_CLASS)->forAll(c : Class | c.transformerToEjbDataClass->notEmpty() or c.transformerToEntityComponent->notEmpty())");
-        this.insertInvariant("everyAssociationClassMustHaveEJBDataClass", "AssociationClass.allInstances()->forAll(ac : AssociationClass | ac.transformerToEjbDataClassfromAssociationClass->notEmpty())");
-        // Toda Class que eh OuterMostContainer precisa de uma EJBEntityComponent
-        this.insertInvariant("everyOuterMostClassmusthaveEJBEntityComponent", "Class.allInstances()->excluding(NULL_CLASS)->select(c : Class | c.isOuterMostContainer())->forAll(c : Class | c.transformerToEntityComponent->notEmpty())");
+
+        // Todo atributo 'id' criado pela regra UMLClassToEJBKeyClass deve pertencer a EJBKeyClass gerada pela mesma regra
+        this.insertInvariant("primaryKeymustbelongstoaEJBKeyClass", "UMLClassToEJBKeyClass.allInstances()->forAll(inst | inst.id.class.name = inst.keyClass.name)");
+
+        // Restricao de cardinalidade das metaclasses
+        // UMLDataTypeToEJBDataType
+        this.insertInvariant("cardinalityRestrictionToUMLDataTypeToEJBDataType", "UMLDataTypeToEJBDataType.allInstances()->forAll(inst | inst.dataType->notEmpty() and inst.ejbDataType->notEmpty())");
+        // UMLClassToEJBKeyClass
+        this.insertInvariant("cardinalityRestrictionToUMLClassToEJBKeyClass", "UMLClassToEJBKeyClass.allInstances()->forAll(inst | inst.class->notEmpty() and inst.id->notEmpty() and inst.keyClass->notEmpty())");
+        // UMLAssociationClassToEJBKeyClass
+        this.insertInvariant("cardinalityRestrictionToUMLAssociationClassToEJBKeyClass", "UMLAssociationClassToEJBKeyClass.allInstances()->forAll(inst | inst.associationClass->notEmpty() and inst.id->notEmpty() and inst.keyClass->notEmpty())");
+        // UMLOperationToBusinessMethod
+        this.insertInvariant("cardinalityRestrictionToUMLOperationToBusinessMethod", "UMLOperationToBusinessMethod.allInstances()->forAll(inst | inst.operation->notEmpty() and inst.businessMethod->notEmpty())");
+        // UMLParameterToEJBParameter
+        this.insertInvariant("cardinalityRestrictionToUMLParameterToEJBParameter", "UMLParameterToEJBParameter.allInstances()->forAll(inst | inst.parameter->notEmpty() and inst.ejbParameter->notEmpty())");
+        // UMLAttributeToEJBAttribute
+        this.insertInvariant("cardinalityRestrictionToUMLAttributeToEJBAttribute", "UMLAttributeToEJBAttribute.allInstances()->forAll(inst | inst.attribute->notEmpty() and inst.ejbAttribute->notEmpty())");
+        // UMLClassToEJBDataClass
+        this.insertInvariant("cardinalityRestrictionToUMLClassToEJBDataClass", "UMLClassToEJBDataClass.allInstances()->forAll(inst | inst.class->notEmpty() and inst.ejbDataClass->notEmpty())");
+        // UMLAssociationToEJBDataAssociation
+        this.insertInvariant("cardinalityRestrictionToUMLAssociationToEJBDataAssociation", "UMLAssociationToEJBDataAssociation.allInstances()->forAll(inst | inst.association->notEmpty() and inst.ejbDataAssociation->notEmpty())");
+        // UMLAssociationClassToEJBDataClass
+        this.insertInvariant("cardinalityRestrictionToUMLAssociationClassToEJBDataClass", "UMLAssociationClassToEJBDataClass.allInstances()->forAll(inst | inst.associationClass->notEmpty() and inst.ejbDataClass->notEmpty())");
+        // UMLAssociationEndToEJBDataEndusingRule8
+        this.insertInvariant("cardinalityRestrictionToUMLAssociationEndToEJBDataEndusingRule8", "UMLAssociationEndToEJBDataEndusingRule8.allInstances()->forAll(inst | inst.associationEnd->notEmpty() and inst.ejbAssociationEnd->notEmpty())");
+        // UMLAssociationEndToEJBDataEndusingRule9
+        this.insertInvariant("cardinalityRestrictionToUMLAssociationEndToEJBDataEndusingRule9", "UMLAssociationEndToEJBDataEndusingRule9.allInstances()->forAll(inst | inst.associationEnd->notEmpty() and inst.ejbAssociationEnd->notEmpty())");
+        // UMLAssociationEndEmEJBAssociationusingRule10
+        this.insertInvariant("cardinalityRestrictionToUMLAssociationEndEmEJBAssociationusingRule10", "UMLAssociationEndEmEJBAssociationusingRule10.allInstances()->forAll(inst | inst.associationEnd->notEmpty() and inst.ejbDataAssociation->notEmpty() and inst.ejbAssociationEnd1->notEmpty() and inst.ejbAssociationEnd2->notEmpty())");
+        // UMLAssociationEndEmEJBAssociationusingRule11
+        this.insertInvariant("cardinalityRestrictionToUMLAssociationEndEmEJBAssociationusingRule11", "UMLAssociationEndEmEJBAssociationusingRule11.allInstances()->forAll(inst | inst.associationEnd->notEmpty() and inst.ejbAssociationEnd2->notEmpty())");
+        // UMLClassToEJBEntityComponent
+        this.insertInvariant("cardinalityRestrictionToUMLClassToEJBEntityComponent", "UMLClassToEJBEntityComponent.allInstances()->forAll(inst | inst.class->notEmpty() and inst.entityComponent->notEmpty() and inst.dataClass->notEmpty() and inst.dataSchema->notEmpty() and inst.servingAttribute->notEmpty())");
+        // UMLSetToEJBSet
+        this.insertInvariant("cardinalityRestrictionToUMLSetToEJBSet", "UMLSetToEJBSet.allInstances()->forAll(inst | inst.umlSet->notEmpty() and inst.ejbSet->notEmpty())");
+        
     }
 
     @Override
