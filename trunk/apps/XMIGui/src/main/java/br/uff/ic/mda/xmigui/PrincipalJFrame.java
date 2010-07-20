@@ -428,7 +428,7 @@ public class PrincipalJFrame extends javax.swing.JFrame {
             // Clear 'results'
             jTextArea2.setText("");
         } catch (Exception ex) {
-            jLabel5.setText("No XMI in use");
+            jLabel5.setText("Problem: " + ex.getMessage());
             // Disable buttons
             jButton1.setEnabled(false);
             jButton2.setEnabled(false);
