@@ -25,21 +25,21 @@
             <artifactId>EOS</artifactId>
             <version>0.3</version>
         </dependency>
-        <dependency>
+        <!--<dependency>
             <groupId>br.uff.ic.mda</groupId>
             <artifactId>transformer-base</artifactId>
             <version>1.1-SNAPSHOT</version>
-        </dependency>
+        </dependency>-->
         <!-- Log -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>1.5.11</version>
         </dependency>
-        <dependency>
+        <!--<dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-nop</artifactId>
             <version>1.5.11</version>
-        </dependency>
+        </dependency>-->
     </dependencies>
 </project>

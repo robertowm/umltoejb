@@ -1,6 +1,5 @@
 package core;
 
-import br.uff.ic.mda.transformer.ModelPersistence;
 import core.exception.XEOSException;
 import core.oclLex.interpreter.Interpreter;
 import core.oclLex.lexer.Lexer;
@@ -18,7 +17,7 @@ import java.util.Vector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class XEOS implements ModelPersistence {
+public class XEOS {
 
     final Logger logger = LoggerFactory.getLogger(XEOS.class);
     private State state;
