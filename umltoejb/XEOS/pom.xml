@@ -4,7 +4,7 @@
     <groupId>br.uff.ic.mda</groupId>
     <artifactId>XEOS</artifactId>
     <packaging>jar</packaging>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.1</version>
     <name>XEOS</name>
     <url>https://code.google.com/p/umltoejb</url>
     <build>
@@ -25,21 +25,11 @@
             <artifactId>EOS</artifactId>
             <version>0.3</version>
         </dependency>
-        <!--<dependency>
-            <groupId>br.uff.ic.mda</groupId>
-            <artifactId>transformer-base</artifactId>
-            <version>1.1-SNAPSHOT</version>
-        </dependency>-->
         <!-- Log -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>1.5.11</version>
         </dependency>
-        <!--<dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-nop</artifactId>
-            <version>1.5.11</version>
-        </dependency>-->
     </dependencies>
 </project>
