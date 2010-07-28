@@ -4,7 +4,7 @@
     <groupId>br.uff.ic.mda</groupId>
     <artifactId>umltoejb</artifactId>
     <packaging>pom</packaging>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.1</version>
     <name>umltoejb</name>
     <url>https://code.google.com/p/umltoejb</url>
     <modules>
